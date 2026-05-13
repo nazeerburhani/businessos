@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BusinessOS | Core Terminal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Geist:wght@100;300;400;500;600;700&amp;family=JetBrains+Mono:wght@100;300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#313031",
+                    "on-secondary-container": "#ddcdff",
+                    "tertiary-fixed": "#e3e2e2",
+                    "surface-variant": "#353436",
+                    "background": "#131314",
+                    "on-error-container": "#ffdad6",
+                    "surface-tint": "#00dbe9",
+                    "surface-container-high": "#2a2a2b",
+                    "on-primary-fixed": "#002022",
+                    "inverse-primary": "#006970",
+                    "secondary-container": "#7000ff",
+                    "on-secondary-fixed": "#23005b",
+                    "surface-bright": "#3a393a",
+                    "secondary-fixed": "#e9ddff",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#b9cacb",
+                    "outline": "#849495",
+                    "on-primary": "#00363a",
+                    "primary-container": "#00f0ff",
+                    "surface-dim": "#131314",
+                    "surface-container-highest": "#353436",
+                    "surface-container-lowest": "#0e0e0f",
+                    "on-secondary": "#3c0090",
+                    "on-primary-container": "#006970",
+                    "primary": "#dbfcff",
+                    "on-secondary-fixed-variant": "#5700c9",
+                    "primary-fixed-dim": "#00dbe9",
+                    "on-tertiary": "#2f3131",
+                    "on-surface": "#e5e2e3",
+                    "inverse-surface": "#e5e2e3",
+                    "primary-fixed": "#7df4ff",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "outline-variant": "#3b494b",
+                    "surface-container": "#201f20",
+                    "error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#464747",
+                    "surface-container-low": "#1c1b1c",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#d1bcff",
+                    "on-background": "#e5e2e3",
+                    "tertiary": "#f6f5f5",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#5e5f5f",
+                    "secondary": "#d1bcff",
+                    "surface": "#131314",
+                    "on-primary-fixed-variant": "#004f54",
+                    "tertiary-container": "#d9d9d9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-padding-mobile": "20px",
+                    "container-padding-desktop": "40px",
+                    "unit": "4px",
+                    "panel-gap": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Space Grotesk"],
+                    "body-lg": ["Geist"],
+                    "display-lg": ["Space Grotesk"],
+                    "headline-lg": ["Space Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Space Grotesk"],
+                    "body-md": ["Geist"],
+                    "data-point": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "data-point": ["14px", {"lineHeight": "1.0", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            color: #e5e2e3;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(28, 27, 28, 0.4);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .neon-rim-cyan {
+            box-shadow: inset 2px 2px 10px rgba(0, 219, 233, 0.15), 0 0 20px rgba(0, 219, 233, 0.05);
+        }
+        .neon-rim-purple {
+            box-shadow: inset 2px 2px 10px rgba(112, 0, 255, 0.15), 0 0 20px rgba(112, 0, 255, 0.05);
+        }
+        .liquid-gradient-primary {
+            background: linear-gradient(135deg, #00dbe9 0%, #7000ff 100%);
+        }
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(112, 0, 255, 0.08) 0%, rgba(5, 5, 5, 0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        .chart-glow {
+            filter: drop-shadow(0 0 8px rgba(0, 219, 233, 0.6));
+        }
+    </style>
+</head>
+<body class="font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<div class="ambient-glow top-[-10%] right-[-10%]"></div>
+<div class="ambient-glow bottom-[-10%] left-[-10%]"></div>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/40 backdrop-blur-2xl border-r border-white/10 shadow-2xl flex flex-col py-8 gap-panel-gutter z-[60]">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim flex items-center justify-center shadow-[0_0_15px_rgba(0,219,233,0.4)]">
+<span class="material-symbols-outlined text-on-primary-fixed" style="font-variation-settings: 'FILL' 1;">terminal</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary-fixed leading-none">Core Terminal</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-60">Enterprise Alpha</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col px-3 gap-1">
+<div class="bg-secondary-container/30 text-primary-fixed-dim border-l-4 border-primary-fixed-dim shadow-[inset_0_0_15px_rgba(0,219,233,0.2)] px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">point_of_sale</span>
+<span class="font-label-caps text-label-caps">POS</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory_2</span>
+<span class="font-label-caps text-label-caps">Inventory</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory</span>
+<span class="font-label-caps text-label-caps">Products</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">shopping_cart</span>
+<span class="font-label-caps text-label-caps">Orders</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">account_balance_wallet</span>
+<span class="font-label-caps text-label-caps">Khata</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">badge</span>
+<span class="font-label-caps text-label-caps">Employees</span>
+</div>
+<div class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 px-4 py-3 rounded-r-lg flex items-center gap-4 cursor-pointer group transition-all duration-200">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">analytics</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</div>
+</nav>
+<div class="mt-auto px-6 py-4 flex flex-col gap-4">
+<button class="w-full liquid-gradient-primary rounded-xl py-3 px-4 flex items-center justify-center gap-2 font-label-caps text-label-caps text-on-primary-fixed shadow-lg shadow-primary-container/20 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[20px]">psychology</span>
+                AI Oracle
+            </button>
+<div class="flex flex-col gap-2 opacity-60">
+<div class="flex items-center gap-3 cursor-pointer hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</div>
+<div class="flex items-center gap-3 cursor-pointer hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[20px]">help_outline</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="bg-surface/20 backdrop-blur-xl w-full sticky top-0 z-50 border-b border-outline-variant/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] h-20 px-container-desktop flex justify-between items-center">
+<div class="flex items-center gap-8">
+<h2 class="font-headline-xl text-headline-xl text-primary font-bold tracking-tighter">BusinessOS</h2>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-primary border-b-2 border-primary-fixed-dim pb-1 cursor-pointer font-medium" href="#">Network</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 px-3 py-1 rounded-lg" href="#">Insights</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 px-3 py-1 rounded-lg" href="#">Sync</a>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50">search</span>
+<input class="bg-surface-container-highest/30 border border-outline-variant/30 rounded-full pl-10 pr-4 py-2 w-64 focus:ring-1 focus:ring-primary-fixed-dim transition-all text-body-md outline-none focus:w-80" placeholder="Search parameters..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<div class="cursor-pointer hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<div class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full ring-2 ring-background"></div>
+</div>
+<div class="cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div class="w-10 h-10 rounded-full border border-primary-fixed-dim/30 overflow-hidden cursor-pointer active:scale-95 transition-transform">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A cinematic close-up portrait of a high-level corporate executive in a sharp, modern charcoal suit. The lighting is dramatic and moody, with cool blue ambient tones reflecting off a glass background. The aesthetic is clean and ultra-premium, matching a dark mode enterprise operating system interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn0pwwVmMr04jNUbArTBhWAxDw3reI0ZJpM1D_B1Axjcyafgw7PJ-aN8RyEoW-_9oZrkALEzU6NyTtjQTjKBkaYKFjXe0hoVirZIFF7gb8RLd_niWezWefPSCA4KvrSKbG5eds9ovlNFFzJXj9eaZWDYLyxBXX2oo-vXMOdlrvWd8vUSvFS4Hik-EvOUNiVurFr6mYkhZchzdkhZoPCCUaCkO09MiFez5n75_bQlxpFrYbhqV5QGq2YWjhllpxCGkt2LCLXTxL1-k"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-container-desktop flex flex-col gap-panel-gap">
+<!-- Top Hero Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Total Sales -->
+<div class="glass-panel neon-rim-cyan rounded-full p-6 flex flex-col gap-4 relative overflow-hidden group">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Total Sales</p>
+<h3 class="font-headline-xl text-headline-xl text-primary-fixed-dim">$1,249,004.00</h3>
+</div>
+<div class="bg-primary-container/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">payments</span>
+</div>
+</div>
+<div class="mt-2 h-16 w-full relative">
+<!-- Simulated Chart Line -->
+<svg class="w-full h-full chart-glow" preserveaspectratio="none" viewbox="0 0 400 60">
+<path d="M0 50 Q 50 20, 100 45 T 200 10 T 300 35 T 400 5" fill="none" stroke="#00dbe9" stroke-width="3"></path>
+<path d="M0 50 Q 50 20, 100 45 T 200 10 T 300 35 T 400 5 V 60 H 0 Z" fill="url(#grad1)" opacity="0.2"></path>
+<defs>
+<lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#00dbe9;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#00dbe9;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed text-sm mt-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span>+12.4% vs last period</span>
+</div>
+</div>
+<!-- Weekly Profit -->
+<div class="glass-panel neon-rim-purple rounded-full p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Weekly Profit</p>
+<h3 class="font-headline-xl text-headline-xl text-secondary-fixed-dim">$84,210.50</h3>
+</div>
+<div class="bg-secondary-container/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+</div>
+</div>
+<div class="mt-2 h-16 w-full relative">
+<svg class="w-full h-full chart-glow" preserveaspectratio="none" viewbox="0 0 400 60">
+<path d="M0 40 Q 80 10, 150 45 T 250 20 T 400 15" fill="none" stroke="#d1bcff" stroke-width="3"></path>
+<path d="M0 40 Q 80 10, 150 45 T 250 20 T 400 15 V 60 H 0 Z" fill="url(#grad2)" opacity="0.2"></path>
+<defs>
+<lineargradient id="grad2" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#d1bcff;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#d1bcff;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex items-center gap-2 text-secondary-fixed text-sm mt-2">
+<span class="material-symbols-outlined text-[16px]">show_chart</span>
+<span>Outperforming targets by 8.2%</span>
+</div>
+</div>
+<!-- Monthly Revenue -->
+<div class="glass-panel neon-rim-cyan rounded-full p-6 flex flex-col gap-4 relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">Monthly Revenue</p>
+<h3 class="font-headline-xl text-headline-xl text-primary-fixed-dim">$412,900.00</h3>
+</div>
+<div class="bg-primary-container/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+</div>
+</div>
+<div class="mt-2 h-16 w-full relative">
+<svg class="w-full h-full chart-glow" preserveaspectratio="none" viewbox="0 0 400 60">
+<path d="M0 55 C 100 50, 200 0, 400 10" fill="none" stroke="#7df4ff" stroke-width="3"></path>
+<path d="M0 55 C 100 50, 200 0, 400 10 V 60 H 0 Z" fill="url(#grad3)" opacity="0.2"></path>
+<defs>
+<lineargradient id="grad3" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#7df4ff;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#7df4ff;stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+</svg>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed text-sm mt-2">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>94% of monthly goal achieved</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Main Content -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- AI Business Insights -->
+<div class="col-span-12 lg:col-span-8 glass-panel rounded-full p-8 border-primary-fixed-dim/20 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-fixed-dim/5 blur-[80px]"></div>
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim text-3xl">hub</span>
+<h2 class="font-headline-lg text-headline-lg">AI Business Insights</h2>
+</div>
+<button class="bg-surface-container-highest/50 px-4 py-2 rounded-lg text-label-caps font-label-caps text-on-surface hover:bg-white/10 transition-colors">Generate Report</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Holographic Recommendations -->
+<div class="bg-primary-fixed-dim/5 border border-primary-fixed-dim/20 rounded-xl p-5 hover:bg-primary-fixed-dim/10 transition-all cursor-pointer group">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary-fixed-dim">auto_awesome</span>
+<span class="text-primary-fixed-dim font-label-caps text-sm tracking-widest">OPTIMIZATION</span>
+</div>
+<h4 class="font-bold text-lg mb-2 text-primary">Inventory Restock Surge</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Predictive models indicate a 24% increase in demand for Tech Gear category over the next 14 days. Recommending immediate 15% stock buffer increase.</p>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-xs font-data-point text-primary-fixed-dim/60">Confidence Score: 98%</span>
+<span class="material-symbols-outlined text-primary-fixed-dim group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<div class="bg-secondary-fixed-dim/5 border border-secondary-fixed-dim/20 rounded-xl p-5 hover:bg-secondary-fixed-dim/10 transition-all cursor-pointer group">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-secondary-fixed-dim">payments</span>
+<span class="text-secondary-fixed-dim font-label-caps text-sm tracking-widest">FINANCE</span>
+</div>
+<h4 class="font-bold text-lg mb-2 text-secondary">Dynamic Pricing Update</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-4">Competitor analysis suggests room for a 3% margin expansion on premium subscription tiers without impacting retention rates.</p>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-xs font-data-point text-secondary-fixed-dim/60">Confidence Score: 84%</span>
+<span class="material-symbols-outlined text-secondary-fixed-dim group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Low Stock Alerts -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-gutter">
+<div class="glass-panel rounded-full p-6 border-error/30 relative">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-2 text-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-label-caps text-label-caps font-bold">CRITICAL ALERTS</h3>
+</div>
+<span class="text-xs text-on-surface-variant">3 Items</span>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-error/5 border-l-2 border-error p-3 rounded-r-lg flex items-center justify-between">
+<div>
+<p class="text-sm font-bold text-on-surface">Cloud Terminal V2</p>
+<p class="text-xs text-error">OUT OF STOCK</p>
+</div>
+<span class="material-symbols-outlined text-error/50">inventory</span>
+</div>
+<div class="bg-error/5 border-l-2 border-error/50 p-3 rounded-r-lg flex items-center justify-between">
+<div>
+<p class="text-sm font-bold text-on-surface">Edge Processor X1</p>
+<p class="text-xs text-error/80">LOW STOCK: 4 units left</p>
+</div>
+<span class="material-symbols-outlined text-error/30">inventory</span>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-outline-variant/30 rounded-lg text-sm text-on-surface hover:bg-white/5 transition-colors">Resolve All</button>
+</div>
+<div class="glass-panel rounded-full p-6 border-primary-fixed-dim/10 flex-1">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-6">CUSTOMER TRENDS</h3>
+<div class="flex flex-col gap-6">
+<div class="flex items-end justify-between gap-1 h-24">
+<div class="bg-primary-fixed-dim/20 w-8 rounded-t-lg relative" style="height: 60%">
+<div class="absolute bottom-0 w-full bg-primary-fixed-dim rounded-t-lg" style="height: 40%"></div>
+</div>
+<div class="bg-primary-fixed-dim/20 w-8 rounded-t-lg relative" style="height: 80%">
+<div class="absolute bottom-0 w-full bg-primary-fixed-dim rounded-t-lg" style="height: 65%"></div>
+</div>
+<div class="bg-primary-fixed-dim/20 w-8 rounded-t-lg relative" style="height: 40%">
+<div class="absolute bottom-0 w-full bg-primary-fixed-dim rounded-t-lg" style="height: 25%"></div>
+</div>
+<div class="bg-primary-fixed-dim/20 w-8 rounded-t-lg relative" style="height: 100%">
+<div class="absolute bottom-0 w-full bg-primary-fixed-dim rounded-t-lg" style="height: 90%"></div>
+</div>
+<div class="bg-primary-fixed-dim/20 w-8 rounded-t-lg relative" style="height: 70%">
+<div class="absolute bottom-0 w-full bg-primary-fixed-dim rounded-t-lg" style="height: 55%"></div>
+</div>
+</div>
+<div class="flex justify-between text-[10px] text-on-surface-variant font-label-caps">
+<span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-highest/20 p-3 rounded-xl">
+<span class="material-symbols-outlined text-primary-fixed-dim">groups</span>
+<div>
+<p class="text-xs text-on-surface-variant">Daily Active Users</p>
+<p class="text-lg font-data-point text-primary">12,840 <span class="text-xs text-primary-fixed-dim">+4.2%</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Employee Performance -->
+<div class="col-span-12 glass-panel rounded-full p-8">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h2 class="font-headline-lg text-headline-lg">Elite Performance Matrix</h2>
+<p class="text-on-surface-variant">Tracking real-time employee contribution and KPIs</p>
+</div>
+<div class="flex gap-2">
+<div class="bg-surface-container-highest/50 p-2 rounded-lg cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</div>
+<div class="bg-surface-container-highest/50 p-2 rounded-lg cursor-pointer hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Employee Card -->
+<div class="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4 hover:border-primary-fixed-dim/50 transition-all duration-300 group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full ring-2 ring-primary-fixed-dim ring-offset-2 ring-offset-background p-0.5">
+<img alt="Employee" class="w-full h-full object-cover rounded-full" data-alt="A professional headshot of a senior system architect in a high-tech environment. The background features softly blurred data server lights and glowing glass surfaces, creating a futuristic corporate aesthetic. The lighting is sophisticated, with a subtle blue rim light that complements a professional dark-mode dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZwW28-o3rFj2B1wi_EHCIwTGPaMF8RKJmp0KC9fc-30yIxaPI6LttNJCbOutRWZ2PeFhBCxIemdSI9L4wEDZea8ZKvhtsa4MKj9HkZiOcjGS4kGvfHu907ZcnBp7YbJHN4_xPq_nPCxpZ7RntupdhAbQ2Yl2F74hsjhSlOTzGVMleMsxz-7j_Gm6w3NkpPIXwyj01eSqL93uYOwKdledEkQ1u8UsaKsi3aPi0YcZrEi8YaNE4lVAuiE982ZUaIUN6DHBOfvMaRLw"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Alex Rivera</h4>
+<p class="text-xs text-on-surface-variant">Regional Lead</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Target Achievement</span>
+<span class="text-primary-fixed-dim">98%</span>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full liquid-gradient-primary w-[98%] shadow-[0_0_8px_rgba(0,219,233,0.5)]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">SALES</p>
+<p class="text-sm font-data-point text-primary">$42.1k</p>
+</div>
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">EFFICIENCY</p>
+<p class="text-sm font-data-point text-primary">A+</p>
+</div>
+</div>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4 hover:border-primary-fixed-dim/50 transition-all duration-300 group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full ring-2 ring-secondary-fixed-dim ring-offset-2 ring-offset-background p-0.5">
+<img alt="Employee" class="w-full h-full object-cover rounded-full" data-alt="A professional portrait of a tech-savvy female operations manager in a minimalist, glass-walled office space. The lighting is crisp and natural but with a high-end cinematic feel. The background hints at a large-scale data monitoring station, maintaining the theme of a premium, intelligent business operating system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiiLJv3ophtpbZ5XbV38YL_Hj8Wv9yBtzsxdlV_ax7qkPwrVRhUDHo2kcs8l2nGR2TuFWzzwqiwAIOze803c1zHla2KU0PxqdWgxqi2jfNOhvfFrqYcfI8Cx3cFLnQ1riOPFUpAadU2FxSjFqfqY61_wX5yEr57HtX3_iI04Q6yVSABo-VRgDA6ku6nHJrktAb4n68QU6FksGG6jPkVvliBP8gD7UCkmr90tbT-QHIcydTd0FYGTpNOi0gMPuPEICVDUrQ35fAVwc"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Sarah Chen</h4>
+<p class="text-xs text-on-surface-variant">Senior Analyst</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Target Achievement</span>
+<span class="text-secondary-fixed-dim">92%</span>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[92%] shadow-[0_0_8px_rgba(209,188,255,0.5)]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">ANALYTICS</p>
+<p class="text-sm font-data-point text-primary">124 Req</p>
+</div>
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">ACCURACY</p>
+<p class="text-sm font-data-point text-primary">99.1%</p>
+</div>
+</div>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4 hover:border-primary-fixed-dim/50 transition-all duration-300 group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full ring-2 ring-primary-fixed ring-offset-2 ring-offset-background p-0.5">
+<img alt="Employee" class="w-full h-full object-cover rounded-full" data-alt="A profile photograph of a young, innovative logistics manager in a modern industrial-tech setting. The background shows soft, warm bokeh from automated warehouse lighting, contrasting with cool foreground highlights. The image is clean, sharp, and perfectly integrated into a luxury enterprise UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXg_KnWPnfS5sAYvW-YaMF_pBCSBEzr2qyd7nlBf4LTyYJoZm5SlXX5v-1q9LurxZw6zjMuRjfdbO6W5BC0L_h_XuY1ok0V_bDfm3dXPkua6yPocKegtqcutinZ8itPnUD1dyjVwGj0Xl7OKm8Q8WS2H5G3ce1PqRbR34QTGG_FTXbr3ZMpIQCmhY03d-5QXAwktnjCbKLCC11aV_MnD3kbU4fAmMP2_U9qeLtDDz9oAiWPIcUbPyJHFUnEEov2O73VGAcFpea-xA"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Marcus Thorne</h4>
+<p class="text-xs text-on-surface-variant">Logistics Dev</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Target Achievement</span>
+<span class="text-primary-fixed">87%</span>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed w-[87%] shadow-[0_0_8px_rgba(125,244,255,0.5)]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">SHIPMENTS</p>
+<p class="text-sm font-data-point text-primary">1.2k/mo</p>
+</div>
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">LOGISTICS</p>
+<p class="text-sm font-data-point text-primary">B+</p>
+</div>
+</div>
+</div>
+<div class="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col gap-4 hover:border-primary-fixed-dim/50 transition-all duration-300 group">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full ring-2 ring-primary-fixed-dim ring-offset-2 ring-offset-background p-0.5">
+<img alt="Employee" class="w-full h-full object-cover rounded-full" data-alt="A cinematic portrait of a creative director in a high-end digital agency environment. The lighting features soft, diffuse purple and cyan glows reflecting from large OLED screens in the background. The visual style is polished, modern, and aligned with a futuristic glassmorphism design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDb7ypbZdgTihdPxNKlzyl6Iijv7w46ct_203rz5kS7GtWZ_bdL22Eb0T0wvwUnK7FgQP4Q7WZluR5mnqA_y1lgtySesSKTg9ZNXCr7hTU-cdGq8NwBA9VBi0j0paynXnUIElt18ZuQOxtWrt8wa5EAMeTu4u7HoZtodPoLv3YLh4zPsuAbGRt8Z9wQAalcoFQM7OC2tFcpZriaLLXe_ettBljweVqefzTagTWot-pw3bxRo9iGcVKWS_kpaOkY0IX66_3WD99GaTE"/>
+</div>
+<div>
+<h4 class="font-bold text-on-surface">Elena Vance</h4>
+<p class="text-xs text-on-surface-variant">Strategy Lead</p>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between text-xs">
+<span class="text-on-surface-variant">Target Achievement</span>
+<span class="text-primary-fixed-dim">104%</span>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full liquid-gradient-primary w-full shadow-[0_0_8px_rgba(0,219,233,0.5)]"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-2">
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">STRATEGY</p>
+<p class="text-sm font-data-point text-primary">Elite</p>
+</div>
+<div class="bg-black/20 rounded-lg p-2">
+<p class="text-[10px] text-on-surface-variant font-label-caps">IMPACT</p>
+<p class="text-sm font-data-point text-primary">High</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB for AI Context (Contextual FAB Suppression would mean hiding this on detail pages, but here on Dashboard it remains) -->
+<div class="fixed bottom-10 right-10 z-[100] group">
+<div class="absolute inset-0 bg-primary-fixed-dim blur-xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
+<button class="relative w-16 h-16 rounded-full liquid-gradient-primary flex items-center justify-center text-on-primary-fixed shadow-2xl active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</button>
+<div class="absolute bottom-full right-0 mb-4 scale-0 group-hover:scale-100 transition-transform origin-bottom-right">
+<div class="glass-panel p-4 rounded-2xl w-64 border-primary-fixed-dim/20 shadow-2xl">
+<p class="text-sm font-bold text-primary mb-1">Oracle Insight Available</p>
+<p class="text-xs text-on-surface-variant">I have identified a resource optimization path that could save $4k this month. View now?</p>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Geist:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            background: rgba(28, 27, 28, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .neon-rim-cyan {
+            box-shadow: inset 0 0 15px rgba(0, 219, 233, 0.1), 0 0 20px rgba(0, 219, 233, 0.05);
+        }
+        .liquid-gradient {
+            background: linear-gradient(135deg, #00dbe9 0%, #7000ff 100%);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#313031",
+                        "on-secondary-container": "#ddcdff",
+                        "tertiary-fixed": "#e3e2e2",
+                        "surface-variant": "#353436",
+                        "background": "#050505",
+                        "on-error-container": "#ffdad6",
+                        "surface-tint": "#00dbe9",
+                        "surface-container-high": "#2a2a2b",
+                        "on-primary-fixed": "#002022",
+                        "inverse-primary": "#006970",
+                        "secondary-container": "#7000ff",
+                        "on-secondary-fixed": "#23005b",
+                        "surface-bright": "#3a393a",
+                        "secondary-fixed": "#e9ddff",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-surface-variant": "#b9cacb",
+                        "outline": "#849495",
+                        "on-primary": "#00363a",
+                        "primary-container": "#00f0ff",
+                        "surface-dim": "#131314",
+                        "surface-container-highest": "#353436",
+                        "surface-container-lowest": "#0e0e0f",
+                        "on-secondary": "#3c0090",
+                        "on-primary-container": "#006970",
+                        "primary": "#dbfcff",
+                        "on-secondary-fixed-variant": "#5700c9",
+                        "primary-fixed-dim": "#00dbe9",
+                        "on-tertiary": "#2f3131",
+                        "on-surface": "#e5e2e3",
+                        "inverse-surface": "#e5e2e3",
+                        "primary-fixed": "#7df4ff",
+                        "tertiary-fixed-dim": "#c6c6c6",
+                        "outline-variant": "#3b494b",
+                        "surface-container": "#201f20",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#464747",
+                        "surface-container-low": "#1c1b1c",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#d1bcff",
+                        "on-background": "#e5e2e3",
+                        "tertiary": "#f6f5f5",
+                        "error": "#ffb4ab",
+                        "on-tertiary-container": "#5e5f5f",
+                        "secondary": "#d1bcff",
+                        "surface": "#131314",
+                        "on-primary-fixed-variant": "#004f54",
+                        "tertiary-container": "#d9d9d9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "container-padding-mobile": "20px",
+                        "container-padding-desktop": "40px",
+                        "unit": "4px",
+                        "panel-gap": "32px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Space Grotesk"],
+                        "body-lg": ["Geist"],
+                        "display-lg": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "body-md": ["Geist"],
+                        "data-point": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "data-point": ["14px", {"lineHeight": "1.0", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<!-- Top Navigation Shell -->
+<header class="bg-surface/20 backdrop-blur-xl border-b border-outline-variant/30 w-full sticky top-0 z-50 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-container-desktop h-20">
+<div class="flex items-center gap-8">
+<h1 class="font-headline-xl text-headline-xl text-primary font-bold tracking-tighter">BusinessOS</h1>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 cursor-pointer active:scale-95" href="#">Network</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 cursor-pointer active:scale-95" href="#">Insights</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 cursor-pointer active:scale-95" href="#">Sync</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed transition-colors">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary-fixed-dim rounded-full shadow-[0_0_10px_#00dbe9]"></span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed transition-colors">settings</span>
+<div class="w-10 h-10 rounded-full border border-primary-fixed-dim/30 overflow-hidden">
+<img alt="Chief Executive Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a high-level corporate executive with sharp, intelligent features, set against a dark, futuristic office background with soft blue atmospheric lighting. The style is professional and high-contrast, echoing the premium BusinessOS aesthetic with deep shadows and cinematic clarity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnUEBU7FEZerqGEexREgGetiIRdburvLjkgYPO_U1EOL2V1MEus2TudMRc57U7mxFOWLfAZM12NrWKdki8cDurPTxZeZbwGmsvxj3X59L_hp03GrCELaI8MA0qaZWyRGN115-y9ZHJzmbNYU6Ljfl7n2klZFt3QqdFtqrq-QQr4dYbCzsaRSC_dfJcoLHSBU7PR6qxcztRCdrCjPTQNT1JRiideUNlqrSWsBkb5JPYEafo7uP6xdwYUsiDx9xmrxzMLaqvbIvpB2g"/>
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- Side Navigation Shell -->
+<aside class="bg-surface-container-low/40 backdrop-blur-2xl border-r border-white/10 fixed left-0 top-0 h-screen w-64 rounded-r-full hidden md:flex flex-col py-8 gap-panel-gutter shadow-2xl z-40">
+<div class="px-8 mb-4">
+<h2 class="font-headline-lg text-headline-lg text-primary-fixed">Core Terminal</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant/60 uppercase">Enterprise Alpha</p>
+</div>
+<div class="flex-1 px-4 space-y-2 overflow-y-auto hide-scrollbar">
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">dashboard</span>
+<span class="font-label-caps text-label-caps">DASHBOARD</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">point_of_sale</span>
+<span class="font-label-caps text-label-caps">POS</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full bg-secondary-container/30 text-primary-fixed-dim border-l-4 border-primary-fixed-dim shadow-[inset_0_0_15px_rgba(0,219,233,0.2)] group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory_2</span>
+<span class="font-label-caps text-label-caps">INVENTORY</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory</span>
+<span class="font-label-caps text-label-caps">PRODUCTS</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">shopping_cart</span>
+<span class="font-label-caps text-label-caps">ORDERS</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">account_balance_wallet</span>
+<span class="font-label-caps text-label-caps">KHATA</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">badge</span>
+<span class="font-label-caps text-label-caps">EMPLOYEES</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group cursor-pointer">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">analytics</span>
+<span class="font-label-caps text-label-caps">ANALYTICS</span>
+</div>
+</div>
+<div class="px-4 mt-auto border-t border-white/5 pt-6">
+<button class="w-full liquid-gradient text-on-primary font-bold py-3 px-6 rounded-full mb-6 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,219,233,0.3)]">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-caps text-label-caps">AI ORACLE</span>
+</button>
+<div class="space-y-2">
+<div class="flex items-center gap-4 px-4 py-2 text-on-surface-variant hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">SETTINGS</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-2 text-on-surface-variant hover:text-on-surface cursor-pointer">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label-caps text-label-caps">SUPPORT</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-0 md:ml-64 flex-1 p-container-padding-desktop">
+<div class="max-w-[1400px] mx-auto">
+<!-- Hero Dashboard Stats (Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-panel-gap mb-panel-gap">
+<div class="col-span-1 md:col-span-2 glass-panel p-8 rounded-xl neon-rim-cyan relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed-dim/10 blur-[60px]"></div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim">warehouse</span> SYSTEM CAPACITY
+                        </h3>
+<div class="flex items-end justify-between">
+<div>
+<span class="font-display-lg text-display-lg text-primary-fixed">84.2<span class="text-headline-lg">%</span></span>
+<p class="text-on-surface-variant/60 font-body-md">Optimized across 12 sectors</p>
+</div>
+<div class="w-24 h-24 flex items-center justify-center relative">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/5" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary-fixed-dim" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="40" stroke-width="8"></circle>
+</svg>
+<span class="absolute material-symbols-outlined text-primary-fixed-dim">bolt</span>
+</div>
+</div>
+</div>
+<div class="glass-panel p-8 rounded-xl flex flex-col justify-between">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">CRITICAL STOCK</h3>
+<div>
+<span class="font-headline-xl text-headline-xl text-error">12</span>
+<div class="flex items-center gap-1 text-error/60 mt-2">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+<span class="font-data-point text-data-point">+3 since 06:00</span>
+</div>
+</div>
+<div class="mt-4 flex gap-1">
+<div class="h-1 flex-1 bg-error rounded-full"></div>
+<div class="h-1 flex-1 bg-error rounded-full opacity-40"></div>
+<div class="h-1 flex-1 bg-white/10 rounded-full"></div>
+</div>
+</div>
+<div class="glass-panel p-8 rounded-xl flex flex-col justify-between border-primary-fixed-dim/20">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">BATCH VELOCITY</h3>
+<div>
+<span class="font-headline-xl text-headline-xl text-primary-fixed">4.2k</span>
+<div class="flex items-center gap-1 text-primary-fixed-dim/60 mt-2">
+<span class="material-symbols-outlined text-[16px]">verified</span>
+<span class="font-data-point text-data-point">99.8% precision</span>
+</div>
+</div>
+<div class="mt-4">
+<div class="h-1 w-full bg-white/5 rounded-full relative overflow-hidden">
+<div class="absolute inset-0 liquid-gradient w-3/4 shadow-[0_0_10px_#00dbe9]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Inventory Control Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-panel-gap">
+<!-- Main Stock Table -->
+<section class="lg:col-span-2 space-y-6">
+<div class="flex justify-between items-center px-2">
+<div class="flex gap-4">
+<h2 class="font-headline-lg text-headline-lg text-primary">Master Inventory</h2>
+<div class="flex bg-surface-container-highest/40 p-1 rounded-lg">
+<button class="px-4 py-1 font-label-caps text-label-caps bg-primary-fixed-dim text-on-primary-fixed rounded">LIVE</button>
+<button class="px-4 py-1 font-label-caps text-label-caps text-on-surface-variant">HISTORY</button>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined p-2 glass-panel rounded-lg cursor-pointer hover:bg-white/5 transition-colors">filter_list</span>
+<span class="material-symbols-outlined p-2 glass-panel rounded-lg cursor-pointer hover:bg-white/5 transition-colors">search</span>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-high/60 border-b border-white/5">
+<tr>
+<th class="p-6 font-label-caps text-label-caps text-on-surface-variant">PRODUCT CORE</th>
+<th class="p-6 font-label-caps text-label-caps text-on-surface-variant">AVAILABILITY</th>
+<th class="p-6 font-label-caps text-label-caps text-on-surface-variant">STATUS</th>
+<th class="p-6 font-label-caps text-label-caps text-on-surface-variant">BATCH ID</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-variant rounded-lg overflow-hidden border border-white/10 group-hover:border-primary-fixed-dim transition-colors">
+<img class="w-full h-full object-cover" data-alt="Ultra-modern technological components, high-precision microchips resting on a reflective black glass surface. Dramatic top-down studio lighting with neon blue accents reflecting on the edges of the components, conveying a premium enterprise hardware aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5PhAF19VZHleZoRlDUCMuNtoplNeTFA6cERDiivRPLSkbXlCOEK5xKw7g4O292TkCvtHQHmmxxyH513PYP0jY-j91S7_55mdKV-mWRM2TND5pcaiGxRJe1pIVUFEAgoHgpx3ELk61SXXsqIYbFCvUo9tOwrJGMl-u2HtacHy4pkmsQztMS_Uj28GTWR_Ajy1IYGcXM4LD9i1c6ROpFtKF58vjYRzX83rbnyQtdCEBPvTCxN6HsrzS4_Ntw6k6Bd7iZ14bpgMApR0"/>
+</div>
+<div>
+<p class="font-body-md text-on-surface font-semibold">Quantum Core Processor</p>
+<p class="font-data-point text-data-point text-on-surface-variant/60">SKU: QC-992-ALPHA</p>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="font-data-point text-headline-lg-mobile text-primary-fixed-dim">1,402</span>
+<p class="font-label-caps text-[10px] text-on-surface-variant">+12.4% vs LY</p>
+</td>
+<td class="p-6">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed-dim/10 border border-primary-fixed-dim/20 text-primary-fixed-dim font-label-caps text-[10px]">
+<span class="w-1 h-1 bg-primary-fixed-dim rounded-full shadow-[0_0_5px_#00dbe9]"></span> STABLE
+                                            </span>
+</td>
+<td class="p-6">
+<span class="font-data-point text-data-point text-on-surface-variant">#BTH-9942</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-variant rounded-lg overflow-hidden border border-white/10 group-hover:border-error transition-colors">
+<img class="w-full h-full object-cover" data-alt="A close-up shot of luminous fiber-optic cables and glowing server components in a dark, high-tech environment. The light is a piercing neon cyan and violet, creating sharp highlights and deep shadows. The atmosphere is dense with digital sophistication." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChwkTY6jRzoUR4_2_E5ebkIf3-vsxgSU83Li8V3jO-cPCLBGHSa0YuIJcN_6q5OHVWALU4drr4olybCBSM6Vu0QChO_UObX_BKgBFclR7LI6m4rBKZBwVmcup_UYseryIHVVtol5KqDxhZtDONC223e9XW59ZoKKcYS-4XtPrEl2_i78jDFyof_d6ZTXJEy4gSjviLDlG-BTAUTglw3V1iRwMkG2CpFUqlhYpV7eQhewMNZwvPSFXz-JiyE5Zh0bFdKGXTga1wPH4"/>
+</div>
+<div>
+<p class="font-body-md text-on-surface font-semibold">Optical Relay Node</p>
+<p class="font-data-point text-data-point text-on-surface-variant/60">SKU: OR-042-EXT</p>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="font-data-point text-headline-lg-mobile text-error">42</span>
+<p class="font-label-caps text-[10px] text-error/60">Reorder Threshold Hit</p>
+</td>
+<td class="p-6">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-error/10 border border-error/20 text-error font-label-caps text-[10px] shadow-[0_0_15px_rgba(255,0,0,0.1)]">
+<span class="w-1 h-1 bg-error rounded-full animate-pulse shadow-[0_0_5px_#ffb4ab]"></span> CRITICAL
+                                            </span>
+</td>
+<td class="p-6">
+<span class="font-data-point text-data-point text-on-surface-variant">#BTH-1021</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="p-6">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-surface-variant rounded-lg overflow-hidden border border-white/10 group-hover:border-secondary-fixed transition-colors">
+<img class="w-full h-full object-cover" data-alt="Abstract view of intricate metallic circuitry and futuristic motherboard textures. The color palette is composed of silver, gunmetal gray, and electric blue light streaks. The style is hyper-realistic with extreme macro detail, illustrating the core of enterprise technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDo0amKmo2_E9tQDNT4a7PkeK9Tsw9fSefMbCWwldGqaQEwrp4sa8_DeGNgEt5UWn2cH9fIja6-Uz73p1Uaytw5qKvYT41gQNlkXi_yAKXq_es2wB_aM3en3rEsOSy2_XSQVWOF3SFl9A6qzSM4ZuxCzhCI_WvcwU5287OYlKkuoZE4AZnpC-2GlgFLMjxbdITa3tJC8sMyPE3YZlAww2IRRaZGXFzEW1RFqt35n7UpRCdgM2YVjfcY06HP_BwwoAHJrMXSkDEvPV4"/>
+</div>
+<div>
+<p class="font-body-md text-on-surface font-semibold">Lithium Power Cell</p>
+<p class="font-data-point text-data-point text-on-surface-variant/60">SKU: LP-CELL-X</p>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="font-data-point text-headline-lg-mobile text-secondary-fixed">892</span>
+<p class="font-label-caps text-[10px] text-on-surface-variant">-2.1% Daily Shift</p>
+</td>
+<td class="p-6">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container/10 border border-secondary-container/20 text-secondary-fixed font-label-caps text-[10px]">
+<span class="w-1 h-1 bg-secondary-fixed rounded-full shadow-[0_0_5px_#d1bcff]"></span> IN-SYNC
+                                            </span>
+</td>
+<td class="p-6">
+<span class="font-data-point text-data-point text-on-surface-variant">#BTH-0883</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Sidebar Panels -->
+<aside class="space-y-panel-gap">
+<!-- Batch Management Controls -->
+<div class="glass-panel p-6 rounded-xl border-white/5">
+<h3 class="font-label-caps text-label-caps text-primary-fixed-dim mb-6">BATCH COMMANDER</h3>
+<div class="space-y-4">
+<div class="bg-surface-container-highest/40 p-4 rounded-lg border border-white/5">
+<div class="flex justify-between items-start mb-2">
+<span class="font-data-point text-data-point text-on-surface">Batch Active: A-72</span>
+<span class="material-symbols-outlined text-primary-fixed-dim text-[18px]">verified_user</span>
+</div>
+<p class="font-label-caps text-[10px] text-on-surface-variant/60 mb-4">EST. ARRIVAL: T-MINUS 14:22:00</p>
+<div class="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full liquid-gradient w-[65%]"></div>
+</div>
+</div>
+<button class="w-full py-3 border border-outline-variant text-on-surface font-label-caps text-label-caps rounded-lg hover:bg-white/5 transition-all">
+                                    RELEASE BATCH
+                                </button>
+<button class="w-full py-3 bg-error-container/20 border border-error/30 text-error font-label-caps text-label-caps rounded-lg hover:bg-error-container/30 transition-all">
+                                    HALT PRODUCTION
+                                </button>
+</div>
+</div>
+<!-- Product Variant Cards -->
+<div class="space-y-4">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant px-2">TOP VARIANTS</h3>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 border-l-4 border-primary-fixed-dim">
+<div class="w-14 h-14 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed-dim">memory</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md text-on-surface font-semibold text-sm">Industrial Grade (v4)</h4>
+<p class="font-data-point text-[12px] text-on-surface-variant">Active: 412 units</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<div class="glass-panel p-4 rounded-xl flex items-center gap-4 border-l-4 border-secondary-container">
+<div class="w-14 h-14 rounded bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-fixed">settings_input_hdmi</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md text-on-surface font-semibold text-sm">Consumer Elite (v2)</h4>
+<p class="font-data-point text-[12px] text-on-surface-variant">Active: 1,012 units</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+<!-- Expiry Tracking -->
+<div class="glass-panel p-6 rounded-xl relative overflow-hidden">
+<div class="absolute -bottom-10 -right-10 w-32 h-32 bg-error/10 blur-[40px]"></div>
+<h3 class="font-label-caps text-label-caps text-error mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">event_busy</span> EXPIRY ALERT
+                            </h3>
+<div class="space-y-4 relative z-10">
+<div class="flex justify-between items-center text-sm">
+<span class="font-body-md text-on-surface">Thermal Paste B-1</span>
+<span class="text-error font-data-point">04 Days</span>
+</div>
+<div class="flex justify-between items-center text-sm text-on-surface-variant">
+<span class="font-body-md">Cooling Liquid C-9</span>
+<span class="font-data-point">12 Days</span>
+</div>
+<div class="flex justify-between items-center text-sm text-on-surface-variant">
+<span class="font-body-md">Silicon Seals G-4</span>
+<span class="font-data-point">28 Days</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+<!-- Warehouse Visualizer -->
+<section class="mt-panel-gap">
+<div class="glass-panel rounded-xl p-8 overflow-hidden relative min-h-[400px]">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg text-headline-lg text-primary">Warehouse Vector Map</h2>
+<div class="flex gap-4">
+<select class="bg-surface-container-highest text-on-surface font-label-caps text-label-caps border-none rounded-lg px-6 py-2 focus:ring-1 focus:ring-primary-fixed-dim">
+<option>ZONE ALPHA (MAIN)</option>
+<option>ZONE BETA (COLD)</option>
+<option>ZONE GAMMA (HAZMAT)</option>
+</select>
+<button class="liquid-gradient px-6 py-2 rounded-lg font-label-caps text-label-caps text-on-primary">EXPAND VIEW</button>
+</div>
+</div>
+<div class="grid grid-cols-4 md:grid-cols-8 gap-4 opacity-70">
+<!-- Simulated Warehouse Racks -->
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden group">
+<div class="absolute inset-x-0 bottom-0 bg-primary-fixed-dim/40 h-3/4 shadow-[0_0_20px_rgba(0,219,233,0.2)]"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-01</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-primary-fixed-dim/40 h-full"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-02</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-error/40 h-1/4"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-03</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-primary-fixed-dim/40 h-2/4"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-04</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-secondary-container/40 h-3/4"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-05</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-primary-fixed-dim/40 h-4/5"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-06</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-white/10 h-1/5"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-07</span>
+</div>
+<div class="h-48 bg-white/5 rounded-lg border border-white/10 flex flex-col items-center justify-end p-2 relative overflow-hidden">
+<div class="absolute inset-x-0 bottom-0 bg-primary-fixed-dim/40 h-3/5"></div>
+<span class="relative z-10 font-data-point text-[10px] text-white">R-08</span>
+</div>
+</div>
+<!-- Absolute Data Floating Element -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 glass-panel p-6 rounded-full border-primary-fixed-dim/50 shadow-[0_0_40px_rgba(0,219,233,0.15)] flex flex-col items-center pointer-events-none">
+<span class="material-symbols-outlined text-primary-fixed-dim text-4xl mb-2">radar</span>
+<span class="font-label-caps text-label-caps text-primary-fixed-dim">OPTIMIZING...</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low/80 backdrop-blur-2xl border-t border-white/5 flex justify-around items-center py-4 z-50">
+<span class="material-symbols-outlined text-on-surface-variant">dashboard</span>
+<span class="material-symbols-outlined text-primary-fixed-dim">inventory_2</span>
+<div class="w-12 h-12 liquid-gradient rounded-full flex items-center justify-center -mt-8 shadow-lg">
+<span class="material-symbols-outlined text-on-primary">add</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">shopping_cart</span>
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</nav>
+</body></html>

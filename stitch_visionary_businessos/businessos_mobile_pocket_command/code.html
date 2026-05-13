@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>BusinessOS Mobile Command</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&amp;family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#313031",
+                    "on-secondary-container": "#ddcdff",
+                    "tertiary-fixed": "#e3e2e2",
+                    "surface-variant": "#353436",
+                    "background": "#050505",
+                    "on-error-container": "#ffdad6",
+                    "surface-tint": "#00dbe9",
+                    "surface-container-high": "#2a2a2b",
+                    "on-primary-fixed": "#002022",
+                    "inverse-primary": "#006970",
+                    "secondary-container": "#7000ff",
+                    "on-secondary-fixed": "#23005b",
+                    "surface-bright": "#3a393a",
+                    "secondary-fixed": "#e9ddff",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#b9cacb",
+                    "outline": "#849495",
+                    "on-primary": "#00363a",
+                    "primary-container": "#00f0ff",
+                    "surface-dim": "#131314",
+                    "surface-container-highest": "#353436",
+                    "surface-container-lowest": "#0e0e0f",
+                    "on-secondary": "#3c0090",
+                    "on-primary-container": "#006970",
+                    "primary": "#dbfcff",
+                    "on-secondary-fixed-variant": "#5700c9",
+                    "primary-fixed-dim": "#00dbe9",
+                    "on-tertiary": "#2f3131",
+                    "on-surface": "#e5e2e3",
+                    "inverse-surface": "#e5e2e3",
+                    "primary-fixed": "#7df4ff",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "outline-variant": "#3b494b",
+                    "surface-container": "#201f20",
+                    "error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#464747",
+                    "surface-container-low": "#1c1b1c",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#d1bcff",
+                    "on-background": "#e5e2e3",
+                    "tertiary": "#f6f5f5",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#5e5f5f",
+                    "secondary": "#d1bcff",
+                    "surface": "#131314",
+                    "on-primary-fixed-variant": "#004f54",
+                    "tertiary-container": "#d9d9d9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-padding-mobile": "20px",
+                    "container-padding-desktop": "40px",
+                    "unit": "4px",
+                    "panel-gap": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Space Grotesk"],
+                    "body-lg": ["Geist"],
+                    "display-lg": ["Space Grotesk"],
+                    "headline-lg": ["Space Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Space Grotesk"],
+                    "body-md": ["Geist"],
+                    "data-point": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "data-point": ["14px", {"lineHeight": "1.0", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #050505;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(28, 27, 28, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(185, 202, 203, 0.1);
+        }
+        .neon-rim {
+            box-shadow: inset 0 1px 1px rgba(0, 219, 233, 0.2);
+        }
+        .liquid-gradient {
+            background: linear-gradient(135deg, #00dbe9 0%, #7000ff 100%);
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface antialiased">
+<!-- Immersive Status Bar Area -->
+<div class="fixed top-0 left-0 w-full h-8 bg-background/80 backdrop-blur-md z-[60] flex items-center justify-between px-6">
+<span class="text-[12px] font-medium text-on-surface">9:41</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[14px]">wifi</span>
+<span class="material-symbols-outlined text-[14px]">battery_very_low</span>
+</div>
+</div>
+<!-- Top Navigation Anchor -->
+<header class="w-full sticky top-0 z-50 bg-surface/20 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center px-6 h-20">
+<div class="flex flex-col">
+<span class="font-headline-xl text-headline-lg text-primary font-bold tracking-tighter">BusinessOS</span>
+<span class="font-label-caps text-[10px] text-primary-fixed-dim tracking-[0.2em] uppercase">Core Terminal</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-on-surface cursor-pointer active:scale-95 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-primary-fixed-dim/30 overflow-hidden active:scale-95 transition-all">
+<img alt="Chief Executive Profile" class="w-full h-full object-cover" data-alt="A professional close-up portrait of a high-level executive with a sharp, modern haircut, wearing a charcoal designer suit. The background is a dark, out-of-focus futuristic office with soft cyan and purple ambient lighting. The lighting is dramatic, high-contrast, and cinematic, reflecting a premium enterprise aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyFgdjEjauonHidyjaleezxOyNYeL37UCXcuOP4SekaU0W9ljsIVedPrTr2Gdkd3VWfc7XIqOvkl2nAF9OZZoWmoa4QnmPBmydN2663KPu76v30IDTCVc7040wt86-9uzeu-xuenhaerLJPedMmEBNEcgj0mMznP_Fcuvm6g9PCRpOGzXe6NNXIetmlTKzBGkASkv2g40JTh2vn9Mnuit4Jz7y4rpLkkz6Jc90g3GnAFUZPevfLd9dUCRhLsjlkHDq2vblYPFpZF0"/>
+</div>
+</div>
+</header>
+<main class="px-6 pt-6 pb-32 flex flex-col gap-8">
+<!-- AI Oracle Insight Section -->
+<section class="glass-panel rounded-full p-6 neon-rim relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-primary-fixed-dim/10 blur-[40px]"></div>
+<div class="flex items-start gap-4">
+<div class="p-3 rounded-full bg-secondary-container/30 text-primary-fixed-dim">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h3 class="font-label-caps text-label-caps text-primary-fixed-dim mb-2 uppercase">AI Oracle Insight</h3>
+<p class="font-body-md text-on-surface leading-relaxed">
+                        Inventory velocity for <span class="text-primary-fixed-dim font-bold">Quantum Chips</span> is up 42%. Recommend adjusting procurement cycle to 14 days to avoid capital lock-up.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Metric Grid (Bento Style) -->
+<section class="grid grid-cols-2 gap-4">
+<div class="glass-panel rounded-full p-5 flex flex-col gap-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">Revenue</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-[24px] text-primary-fixed-dim">$1.2M</span>
+</div>
+<div class="flex items-center gap-1 text-[12px] text-primary-fixed">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>12%</span>
+</div>
+</div>
+<div class="glass-panel rounded-full p-5 flex flex-col gap-2">
+<span class="font-label-caps text-[10px] text-on-surface-variant uppercase">Burn Rate</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-[24px] text-error">$142k</span>
+</div>
+<div class="flex items-center gap-1 text-[12px] text-error">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+<span>4%</span>
+</div>
+</div>
+</section>
+<!-- Analytics Swipe Section -->
+<section class="flex flex-col gap-4">
+<div class="flex justify-between items-end px-1">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface">Market Pulse</h2>
+<p class="font-body-md text-on-surface-variant text-sm">Real-time performance distribution</p>
+</div>
+<button class="text-primary-fixed-dim font-label-caps text-[10px] border-b border-primary-fixed-dim/50 pb-1">VIEW DETAILED</button>
+</div>
+<div class="overflow-x-auto flex gap-4 scrollbar-hide snap-x snap-mandatory">
+<!-- Card 1: Sales Velocity -->
+<div class="min-w-[85vw] snap-center glass-panel rounded-full p-6 flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SALES VELOCITY</span>
+<span class="material-symbols-outlined text-primary-fixed-dim">analytics</span>
+</div>
+<div class="h-32 w-full flex items-end gap-2">
+<div class="w-full bg-primary-fixed-dim/20 rounded-t-lg h-[40%] transition-all"></div>
+<div class="w-full bg-primary-fixed-dim/40 rounded-t-lg h-[60%] transition-all"></div>
+<div class="w-full bg-primary-fixed-dim/20 rounded-t-lg h-[35%] transition-all"></div>
+<div class="w-full liquid-gradient rounded-t-lg h-[90%] shadow-[0_0_15px_rgba(0,219,233,0.4)] transition-all"></div>
+<div class="w-full bg-primary-fixed-dim/20 rounded-t-lg h-[50%] transition-all"></div>
+<div class="w-full bg-primary-fixed-dim/20 rounded-t-lg h-[45%] transition-all"></div>
+</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label-caps">ACTIVE DEALS</span>
+<span class="font-data-point text-primary-fixed-dim">1,482</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-on-surface-variant font-label-caps">CONVERSION</span>
+<span class="font-data-point text-primary-fixed-dim">18.4%</span>
+</div>
+</div>
+</div>
+<!-- Card 2: User Engagement -->
+<div class="min-w-[85vw] snap-center glass-panel rounded-full p-6 flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant">RETENTION</span>
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+<div class="h-32 flex items-center justify-center relative">
+<div class="w-24 h-24 rounded-full border-[8px] border-surface-container-high relative flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-[8px] border-secondary border-t-transparent -rotate-45 shadow-[inset_0_0_10px_rgba(209,188,255,0.3)]"></div>
+<span class="font-headline-lg text-secondary">88%</span>
+</div>
+</div>
+<div class="flex justify-between items-center border-t border-outline-variant/30 pt-4">
+<div class="flex flex-col">
+<span class="text-[10px] text-on-surface-variant font-label-caps">NEW USERS</span>
+<span class="font-data-point text-secondary">+2.4k</span>
+</div>
+<div class="flex flex-col items-end">
+<span class="text-[10px] text-on-surface-variant font-label-caps">CHURN RATE</span>
+<span class="font-data-point text-secondary">1.2%</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Transaction Feed -->
+<section class="flex flex-col gap-4">
+<h2 class="font-headline-lg text-headline-lg-mobile text-on-surface px-1">Live Feed</h2>
+<div class="flex flex-col gap-3">
+<div class="glass-panel rounded-xl p-4 flex items-center justify-between neon-rim">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img alt="Tech Customer" class="w-full h-full object-cover" data-alt="A candid profile photo of a modern tech professional with minimalist glasses and a neutral expression. The scene is shot with shallow depth of field against a backdrop of a blurred, vibrant urban environment at twilight, using deep purples and electric blues for a professional mobile app profile aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJGI-EZWjJ6mLgCcc8yX3on2Vnce6ia741eN3cJnfglRNztVpDnY3fk8IX0cspV_KUwDJpiCOBBtUWJcqYN6QjWYI4qrlKLxPG1_1ipuP9F3C6h98zete7OkHxIQQbCOuC1lrE2dPCcNEaZSsT0VTOeV-sLXxxrpo1Fa9JPzMrMTZFUA9OnlBbvhBamp3t97hJZ7RGrglpWjatMHkknzpNTqf81b4mRaX2ca-P-ZIzmK7gimHleUh1WBD-aiIkexqOo3HCqF6dQuY"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-on-surface font-semibold">Stark Industries</span>
+<span class="text-[12px] text-on-surface-variant">Enterprise Sync Active</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-data-point text-primary-fixed-dim">+$4,200</span>
+<p class="text-[10px] text-on-surface-variant uppercase">2m ago</p>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-4 flex items-center justify-between neon-rim opacity-80">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center">
+<span class="material-symbols-outlined text-outline">database</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-on-surface font-semibold">Cloud Storage</span>
+<span class="text-[12px] text-on-surface-variant">Infrastructure Cost</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-data-point text-on-surface">-$1,120</span>
+<p class="text-[10px] text-on-surface-variant uppercase">15m ago</p>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-4 flex items-center justify-between neon-rim opacity-60">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-highest flex items-center justify-center">
+<img alt="Developer Partner" class="w-full h-full object-cover" data-alt="A portrait of a male software engineer wearing a premium black hoodie, looking thoughtfully at a screen off-camera. His face is lit by the blue glow of a computer monitor in a dark room. The aesthetic is clean, moody, and highly focused, emphasizing a sense of high-end engineering and digital expertise." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKvQ9QQrZrz-0ZO9VBtL2X8FymGWXexZ4xPtkHGUOFvZuUC_YrxhfOMV-0FwIJztefqUq1Wt1rCwffYI5iNbINhE7Zz7IKH34WTX6bzqbuEBygRu5so8w-FiB2qQq0b7v3iaBiaRoi9MO2VZaHGR6w2PJ78H_YsYT0q6Stgg6xufLUrSQLBf-6zYwv4L0p3ao84RtZNslzBI56NR53y7UKaLvIFOUvVQ7AXWwzRjnUvUstPFTTBImgLiIynspxGmTcK1Ju-chJoR4"/>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-on-surface font-semibold">Apex Labs</span>
+<span class="text-[12px] text-on-surface-variant">API License Issued</span>
+</div>
+</div>
+<div class="text-right">
+<span class="font-data-point text-primary-fixed-dim">+$850</span>
+<p class="text-[10px] text-on-surface-variant uppercase">1h ago</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button (FAB) Contextual for Dashboard -->
+<button class="fixed bottom-24 right-6 w-14 h-14 rounded-full liquid-gradient shadow-[0_8px_24px_rgba(0,219,233,0.4)] flex items-center justify-center text-on-primary-fixed z-50 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- Floating Bottom Navigation -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] h-16 glass-panel rounded-full z-50 px-4 flex items-center justify-between shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
+<div class="flex-1 flex flex-col items-center justify-center gap-1 bg-secondary-container/30 text-primary-fixed-dim rounded-full h-12 shadow-[inset_0_0_15px_rgba(0,219,233,0.2)]">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-[9px] uppercase">DASHBOARD</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">point_of_sale</span>
+<span class="font-label-caps text-[9px] uppercase">POS</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">inventory_2</span>
+<span class="font-label-caps text-[9px] uppercase">STOCK</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">analytics</span>
+<span class="font-label-caps text-[9px] uppercase">DATA</span>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[24px]">settings</span>
+<span class="font-label-caps text-[9px] uppercase">SETUP</span>
+</div>
+</nav>
+<!-- Content Bleed Mask for Navigation Depth -->
+<div class="fixed bottom-0 left-0 w-full h-32 bg-gradient-to-t from-background to-transparent pointer-events-none z-40"></div>
+</body></html>

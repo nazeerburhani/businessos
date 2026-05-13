@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BusinessOS | Core Terminal POS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Geist:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#313031",
+                    "on-secondary-container": "#ddcdff",
+                    "tertiary-fixed": "#e3e2e2",
+                    "surface-variant": "#353436",
+                    "background": "#050505",
+                    "on-error-container": "#ffdad6",
+                    "surface-tint": "#00dbe9",
+                    "surface-container-high": "#2a2a2b",
+                    "on-primary-fixed": "#002022",
+                    "inverse-primary": "#006970",
+                    "secondary-container": "#7000ff",
+                    "on-secondary-fixed": "#23005b",
+                    "surface-bright": "#3a393a",
+                    "secondary-fixed": "#e9ddff",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-surface-variant": "#b9cacb",
+                    "outline": "#849495",
+                    "on-primary": "#00363a",
+                    "primary-container": "#00f0ff",
+                    "surface-dim": "#131314",
+                    "surface-container-highest": "#353436",
+                    "surface-container-lowest": "#0e0e0f",
+                    "on-secondary": "#3c0090",
+                    "on-primary-container": "#006970",
+                    "primary": "#dbfcff",
+                    "on-secondary-fixed-variant": "#5700c9",
+                    "primary-fixed-dim": "#00dbe9",
+                    "on-tertiary": "#2f3131",
+                    "on-surface": "#e5e2e3",
+                    "inverse-surface": "#e5e2e3",
+                    "primary-fixed": "#7df4ff",
+                    "tertiary-fixed-dim": "#c6c6c6",
+                    "outline-variant": "#3b494b",
+                    "surface-container": "#201f20",
+                    "error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#464747",
+                    "surface-container-low": "#1c1b1c",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#d1bcff",
+                    "on-background": "#e5e2e3",
+                    "tertiary": "#f6f5f5",
+                    "error": "#ffb4ab",
+                    "on-tertiary-container": "#5e5f5f",
+                    "secondary": "#d1bcff",
+                    "surface": "#131314",
+                    "on-primary-fixed-variant": "#004f54",
+                    "tertiary-container": "#d9d9d9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-padding-mobile": "20px",
+                    "container-padding-desktop": "40px",
+                    "unit": "4px",
+                    "panel-gap": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-xl": ["Space Grotesk"],
+                    "body-lg": ["Geist"],
+                    "display-lg": ["Space Grotesk"],
+                    "headline-lg": ["Space Grotesk"],
+                    "label-caps": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Space Grotesk"],
+                    "body-md": ["Geist"],
+                    "data-point": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "headline-xl": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["72px", {"lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "data-point": ["14px", {"lineHeight": "1.0", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(28, 27, 28, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .holographic-edge {
+            box-shadow: inset 0 0 15px rgba(0, 219, 233, 0.1), 0 0 20px rgba(0, 219, 233, 0.05);
+        }
+        .neon-rim {
+            border-top: 1px solid rgba(0, 219, 233, 0.4);
+            border-left: 1px solid rgba(0, 219, 233, 0.4);
+        }
+        .liquid-gradient {
+            background: linear-gradient(135deg, #00dbe9 0%, #7000ff 100%);
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 219, 233, 0.2); border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen selection:bg-primary-fixed-dim/30">
+<!-- Ambient Glow Layers -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-secondary-container/10 blur-[120px] rounded-full z-0"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-primary-fixed-dim/5 blur-[120px] rounded-full z-0"></div>
+<!-- Side Navigation Shell -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-surface-container-low/40 backdrop-blur-2xl border-r border-white/10 shadow-2xl flex flex-col py-8 gap-panel-gutter z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full liquid-gradient flex items-center justify-center shadow-lg shadow-primary-fixed-dim/20">
+<span class="material-symbols-outlined text-on-primary font-bold">rocket_launch</span>
+</div>
+<div>
+<h1 class="font-headline-lg text-primary-fixed text-lg leading-tight">Core Terminal</h1>
+<p class="font-label-caps text-[10px] text-on-surface-variant tracking-widest uppercase">Enterprise Alpha</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-4 px-6 py-4 bg-secondary-container/30 text-primary-fixed-dim border-l-4 border-primary-fixed-dim shadow-[inset_0_0_15px_rgba(0,219,233,0.2)] group transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">point_of_sale</span>
+<span class="font-label-caps">POS</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory_2</span>
+<span class="font-label-caps">Inventory</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">inventory</span>
+<span class="font-label-caps">Products</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">shopping_cart</span>
+<span class="font-label-caps">Orders</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-4 text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200 group" href="#">
+<span class="material-symbols-outlined group-hover:translate-x-1 duration-300">analytics</span>
+<span class="font-label-caps">Analytics</span>
+</a>
+</nav>
+<div class="mt-auto px-6 flex flex-col gap-4">
+<button class="w-full py-3 px-4 rounded-xl glass-panel border-primary-fixed-dim/30 text-primary-fixed flex items-center justify-center gap-2 hover:bg-primary-fixed-dim/10 transition-all">
+<span class="material-symbols-outlined text-sm">auto_awesome</span>
+<span class="font-label-caps">AI Oracle</span>
+</button>
+<div class="flex flex-col gap-2 pt-4 border-t border-white/5">
+<a class="flex items-center gap-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-xs">Settings</span>
+</a>
+<a class="flex items-center gap-4 py-2 text-on-surface-variant hover:text-on-surface transition-colors" href="#">
+<span class="material-symbols-outlined">help_outline</span>
+<span class="font-label-caps text-xs">Support</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Command Deck -->
+<main class="ml-64 h-full flex flex-col relative z-10">
+<!-- Top App Bar -->
+<header class="h-20 w-full sticky top-0 z-50 bg-surface/20 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-container-desktop shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2 bg-surface-container-highest/40 px-4 py-2 rounded-full border border-white/5">
+<span class="material-symbols-outlined text-primary-fixed-dim text-lg">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md text-on-surface w-64" placeholder="Scan or search products..." type="text"/>
+<span class="text-on-surface-variant text-[10px] font-label-caps border border-white/20 px-1.5 rounded">⌘K</span>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-primary border-b-2 border-primary-fixed-dim pb-1 font-headline-lg text-sm tracking-wide" href="#">Network</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 cursor-pointer active:scale-95 text-sm" href="#">Insights</a>
+<a class="text-on-surface-variant font-medium hover:text-primary-fixed hover:bg-surface-variant/20 transition-all duration-300 cursor-pointer active:scale-95 text-sm" href="#">Sync</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed transition-colors">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed transition-colors">settings</span>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-white/10">
+<div class="text-right">
+<p class="text-xs font-label-caps text-on-surface">Alex Rivera</p>
+<p class="text-[10px] font-label-caps text-primary-fixed-dim">Chief Executive</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim/50 p-0.5">
+<img alt="Chief Executive Profile" class="w-full h-full rounded-full object-cover" data-alt="A professional portrait of a tech executive with sharp facial features, wearing a modern dark charcoal suit. The lighting is dramatic and cool-toned, with cyan highlights reflecting off their skin. The background is a blurred high-tech corporate office with glass and glowing geometric patterns in a deep black and electric blue palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1fAEH7vXzKjEBp-fftfYswFOPqd0I5jk22bDIaNxR76r2oi9uCiKimFErC4ZPvH7BE_6urgz4RsMvMAcL66uutHfkQMeocq2PvzPHtIxCMSvEdXXFVIUo6FC10WcdD1bm8W5DyK7XJZD4GV5e71axRB38lep-rKLTZ4gIWQu4Kk9IYfablf1-COIQIoP2IYyafYX4zU_xsr49nrEGfudRabdGur5zcsepYBX47ennReBi5SYPd22HazvzklV-DSvsIBr3CAlGa5I"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-panel-gap flex gap-panel-gap overflow-hidden">
+<!-- Product Grid Section -->
+<section class="flex-1 flex flex-col gap-6 overflow-y-auto pr-2">
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline-xl text-primary-fixed">Product Grid</h2>
+<p class="text-on-surface-variant font-label-caps text-xs">84 ITEMS AVAILABLE IN CATEGORY: WEARABLES</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 glass-panel rounded-lg text-primary-fixed-dim"><span class="material-symbols-outlined">grid_view</span></button>
+<button class="p-2 glass-panel border-transparent text-on-surface-variant"><span class="material-symbols-outlined">view_list</span></button>
+</div>
+</div>
+<!-- Product Cards Bento -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Product 1 -->
+<div class="glass-panel neon-rim rounded-xl p-4 flex flex-col gap-4 group hover:shadow-[0_0_30px_rgba(0,219,233,0.15)] transition-all duration-500">
+<div class="relative h-48 rounded-lg overflow-hidden bg-surface-container-lowest">
+<img alt="Product Image" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700" data-alt="A sleek, minimalist white smart watch with a matte finish, resting on a dark, reflective granite surface. Soft cyan light glows from beneath the watch, casting a futuristic aura. The background is deep black with subtle floating holographic interface elements like battery icons and health stats." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANtC6IEQV2NQWSo40yWaEMVVuV8H2M2LDrSCGd560lmilLlUuAcf3Hm7DJya_Ndd4TFNvFxv6cMkLgDPVboU3pzHjn22jdmfdq_jSio_llyIOt1wFwCwjbCDTftSILgxF7UnLdijRMd18RuJqwNLSyioho1DfZA8176vXas_Fz9CUsOHpgBPMnaSk9t2zbU7x2xR74CA1ZAya_JBntxa_nhlGhJC-2FDzAMAzfFjSuOmktRNQo3fu1G0g6O2ICo5xmfVQH8xA-K6A"/>
+<div class="absolute top-3 right-3 bg-primary-fixed-dim/20 backdrop-blur-md px-2 py-1 rounded border border-primary-fixed-dim/40">
+<span class="font-data-point text-primary-fixed-dim text-xs">$299.00</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-lg text-lg text-on-surface">Nexus V1 Watch</h3>
+<p class="text-on-surface-variant text-xs font-body-md">Advanced biometric tracking &amp; neural link.</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-label-caps text-on-surface-variant">VARIANTS</span>
+<div class="flex gap-1.5">
+<div class="w-4 h-4 rounded-full bg-white border border-white/20 cursor-pointer ring-2 ring-primary-fixed-dim"></div>
+<div class="w-4 h-4 rounded-full bg-surface-variant border border-white/20 cursor-pointer"></div>
+<div class="w-4 h-4 rounded-full bg-primary-fixed-dim border border-white/20 cursor-pointer"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 rounded-lg bg-surface-container-highest border border-white/10 font-label-caps text-[10px] text-on-surface hover:border-primary-fixed-dim/50 transition-colors">42MM</button>
+<button class="flex-1 py-2 rounded-lg bg-primary-fixed-dim/10 border border-primary-fixed-dim/40 font-label-caps text-[10px] text-primary-fixed-dim">44MM</button>
+<button class="flex-1 py-2 rounded-lg bg-surface-container-highest border border-white/10 font-label-caps text-[10px] text-on-surface hover:border-primary-fixed-dim/50 transition-colors">46MM</button>
+</div>
+</div>
+<button class="w-full py-3 liquid-gradient rounded-lg text-on-primary font-label-caps text-sm font-bold shadow-lg shadow-primary-fixed-dim/20 active:scale-[0.98] transition-transform">ADD TO CART</button>
+</div>
+<!-- Product 2 -->
+<div class="glass-panel neon-rim rounded-xl p-4 flex flex-col gap-4 group hover:shadow-[0_0_30px_rgba(0,219,233,0.15)] transition-all duration-500">
+<div class="relative h-48 rounded-lg overflow-hidden bg-surface-container-lowest">
+<img alt="Product Image" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700" data-alt="Modern high-fidelity over-ear headphones with a matte black carbon fiber finish. The headphones feature glowing cyan LED rings on the earcups. They are presented in a dark, atmospheric environment with floating digital audio waveforms in the air, creating an immersive, futuristic technological mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9lOseAE9dqpa-xUl1ASM7oa-XnXRNkoC_dADP5MFbrx9yY4r1QZt7eGE798DXjJgkMPXwcmE0LGCx8-T3i6nE1dzJ2GMKqpy82UEbGm8X4cqNjfGdMmzHxvz-F9Uxk5bHy_9obbIRvKZ228f6T8fNeVZ5XOMmhc7rxHnzV9LVpeMPmWivSBr_EJWr801gTADn8t_gmnXdl1u9yAb2IcRYMbGvQAcoI26CZkvAQ3j8c0L77XhwWGiLgDlDAPxaHKtCltk9fysPQuM"/>
+<div class="absolute top-3 right-3 bg-primary-fixed-dim/20 backdrop-blur-md px-2 py-1 rounded border border-primary-fixed-dim/40">
+<span class="font-data-point text-primary-fixed-dim text-xs">$549.00</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-lg text-lg text-on-surface">Titan Audio Pro</h3>
+<p class="text-on-surface-variant text-xs font-body-md">Spatial resonance with zero-latency.</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-label-caps text-on-surface-variant">COLORWAYS</span>
+<div class="flex gap-1.5">
+<div class="w-4 h-4 rounded-full bg-black border border-white/40 cursor-pointer ring-2 ring-primary-fixed-dim"></div>
+<div class="w-4 h-4 rounded-full bg-slate-400 border border-white/20 cursor-pointer"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 rounded-lg bg-primary-fixed-dim/10 border border-primary-fixed-dim/40 font-label-caps text-[10px] text-primary-fixed-dim">STANDARD</button>
+<button class="flex-1 py-2 rounded-lg bg-surface-container-highest border border-white/10 font-label-caps text-[10px] text-on-surface hover:border-primary-fixed-dim/50 transition-colors">CARBON</button>
+</div>
+</div>
+<button class="w-full py-3 liquid-gradient rounded-lg text-on-primary font-label-caps text-sm font-bold shadow-lg shadow-primary-fixed-dim/20 active:scale-[0.98] transition-transform">ADD TO CART</button>
+</div>
+<!-- Product 3 -->
+<div class="glass-panel neon-rim rounded-xl p-4 flex flex-col gap-4 group hover:shadow-[0_0_30px_rgba(0,219,233,0.15)] transition-all duration-500">
+<div class="relative h-48 rounded-lg overflow-hidden bg-surface-container-lowest">
+<img alt="Product Image" class="w-full h-full object-cover opacity-80 group-hover:scale-110 transition-transform duration-700" data-alt="A transparent ergonomic gaming mouse showing internal circuit boards illuminated by purple and cyan fiber optic lights. The mouse sits on a sleek obsidian desk surface. Around it, delicate digital data streams and holographic specs float in a dark, ultra-modern tech laboratory aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgrqmFZi93nZIpWkYhzsS4YTRZ_8bqDBBgxJyUA4aZ9zC7Ngwm4FunGuMj5UGnt3R3cXAxxnhfYAGQwZhhluZyXbEWB3IyFx7_u8lKMAbMmb50NUUKZ1mf1BWAs1Z9rMPN3yglCAC7SdnlzcC69nXWH0nU1vKFtAyCY-0HYmv2x0BA9dJHtLzwj_bYkpPOX-dSD7zoMwIGfbGo-VhR4ODF39rwYrb-F0GQQk-RsSDQbcN_yKLl2aMTea1cVwzgM9jzOD4emgS8GMk"/>
+<div class="absolute top-3 right-3 bg-primary-fixed-dim/20 backdrop-blur-md px-2 py-1 rounded border border-primary-fixed-dim/40">
+<span class="font-data-point text-primary-fixed-dim text-xs">$129.00</span>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="font-headline-lg text-lg text-on-surface">Synapse Mouse</h3>
+<p class="text-on-surface-variant text-xs font-body-md">Quantum sensor with adaptive weight.</p>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<span class="text-[10px] font-label-caps text-on-surface-variant">WEIGHT</span>
+<div class="flex gap-1.5">
+<div class="w-4 h-4 rounded-full bg-slate-800 border border-white/20 cursor-pointer ring-2 ring-primary-fixed-dim"></div>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-2 rounded-lg bg-surface-container-highest border border-white/10 font-label-caps text-[10px] text-on-surface hover:border-primary-fixed-dim/50 transition-colors">65G</button>
+<button class="flex-1 py-2 rounded-lg bg-surface-container-highest border border-white/10 font-label-caps text-[10px] text-on-surface hover:border-primary-fixed-dim/50 transition-colors">80G</button>
+<button class="flex-1 py-2 rounded-lg bg-primary-fixed-dim/10 border border-primary-fixed-dim/40 font-label-caps text-[10px] text-primary-fixed-dim">ADAPTIVE</button>
+</div>
+</div>
+<button class="w-full py-3 liquid-gradient rounded-lg text-on-primary font-label-caps text-sm font-bold shadow-lg shadow-primary-fixed-dim/20 active:scale-[0.98] transition-transform">ADD TO CART</button>
+</div>
+</div>
+<!-- Barcode Scanner Visual Area -->
+<div class="mt-8 glass-panel rounded-2xl p-8 border-dashed border-primary-fixed-dim/30 flex flex-col items-center justify-center gap-4 relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary-fixed-dim/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-full h-1 bg-primary-fixed-dim shadow-[0_0_15px_rgba(0,219,233,0.8)] absolute top-1/2 left-0 animate-pulse"></div>
+<span class="material-symbols-outlined text-5xl text-primary-fixed-dim">barcode_scanner</span>
+<div class="text-center">
+<p class="font-headline-lg text-xl text-primary-fixed">Ready to Scan</p>
+<p class="text-on-surface-variant font-label-caps text-xs">ALIGN BARCODE WITHIN THE COMMAND ZONE</p>
+</div>
+</div>
+</section>
+<!-- Floating Holographic Cart -->
+<aside class="w-[420px] glass-panel holographic-edge rounded-3xl flex flex-col p-6 shadow-2xl relative border border-white/10">
+<div class="absolute top-0 right-10 w-20 h-1 liquid-gradient rounded-b-full opacity-50"></div>
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-lg text-2xl text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim">shopping_cart</span>
+                        Active Cart
+                    </h2>
+<span class="bg-primary-fixed-dim/10 text-primary-fixed-dim px-3 py-1 rounded-full text-[10px] font-label-caps border border-primary-fixed-dim/30">3 ITEMS</span>
+</div>
+<!-- Cart Items -->
+<div class="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 mb-6">
+<div class="flex gap-4 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-primary-fixed-dim/30 transition-all group">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Item" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="A professional close-up of a high-tech white smartwatch on a dark grey background with neon cyan interface elements floating around it." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJgEXEZ1303ukfdxhwkhyZDEGMD-qlONRxZuvghIbTWm5vjk4XXwANEmQZT5DjLP94i3NznBsHgZ8L4iTIKxBEeTvvsUguHHiqtkLQeLp_Q24zUU4iFG_aZ-1Lv4vwb9-u8sdQh_TN4m9zrZeyLxg3ncuceVPkrbGUKabnLD-HFXYBUfuZJ1J3iQm8EFca_zN8aElb2JAM_K35W9icPscuDwNQ0c7HBVXgwJO_eaiIHcBhAO7BI3Rxf0QKaycPITi6uORYjSfT_o0"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between">
+<span class="font-body-md text-sm text-on-surface">Nexus V1 Watch</span>
+<span class="font-data-point text-primary-fixed-dim text-sm">$299.00</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] font-label-caps text-on-surface-variant">44MM / WHITE</span>
+<div class="flex items-center gap-2">
+<button class="w-5 h-5 rounded flex items-center justify-center bg-white/5 border border-white/10 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-xs">remove</span></button>
+<span class="font-data-point text-xs">01</span>
+<button class="w-5 h-5 rounded flex items-center justify-center bg-white/5 border border-white/10 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-xs">add</span></button>
+</div>
+</div>
+</div>
+</div>
+<div class="flex gap-4 p-3 rounded-xl bg-white/5 border border-white/5 hover:border-primary-fixed-dim/30 transition-all group">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest overflow-hidden">
+<img alt="Item" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all" data-alt="Close up of futuristic black headphones with glowing blue light rings on the ears, set against a dark carbon fiber texture background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYBPEvMbTldpRsdh21SGieZQ1HKGhiIBnwT2u4rY-kphY7ucRgKBm5AXlGM08e3nsUcnXMGj7ZSidAUh9v8uOTSIoz7Uh2Jyi4qF6OiEuEW2ZSPrK21y8H7YP8Nc0xFIKV9jS1f-_356APnm9v0_t_P5yFHa_uRn20Y14EEKFwNhOfv1QKaG6QKE0os8HCBy-FcoMtJvOsWvhtBEzOCHjzqFdlaJQO5GLlGzArypDSF-WSn0PpAy7P-97rXpi-lxM6MM0U8vuQw8g"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between">
+<span class="font-body-md text-sm text-on-surface">Titan Audio Pro</span>
+<span class="font-data-point text-primary-fixed-dim text-sm">$549.00</span>
+</div>
+<div class="flex justify-between items-center mt-1">
+<span class="text-[10px] font-label-caps text-on-surface-variant">CARBON / PRO</span>
+<div class="flex items-center gap-2">
+<button class="w-5 h-5 rounded flex items-center justify-center bg-white/5 border border-white/10 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-xs">remove</span></button>
+<span class="font-data-point text-xs">01</span>
+<button class="w-5 h-5 rounded flex items-center justify-center bg-white/5 border border-white/10 text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-xs">add</span></button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Animated Billing Details -->
+<div class="bg-surface-container-lowest/60 rounded-2xl p-5 border border-white/5 flex flex-col gap-3 mb-6 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(112,0,255,0.05),transparent)]"></div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant font-label-caps text-[10px]">SUBTOTAL</span>
+<span class="text-on-surface font-data-point text-sm">$848.00</span>
+</div>
+<div class="flex justify-between">
+<span class="text-on-surface-variant font-label-caps text-[10px]">ESTIMATED TAX (8%)</span>
+<span class="text-on-surface font-data-point text-sm">$67.84</span>
+</div>
+<div class="flex justify-between border-t border-white/10 pt-3">
+<span class="text-primary-fixed font-headline-lg text-lg">TOTAL</span>
+<span class="text-primary-fixed font-headline-lg text-2xl tracking-tighter">$915.84</span>
+</div>
+</div>
+<!-- Split Payment System UI -->
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center px-1">
+<span class="text-[10px] font-label-caps text-on-surface-variant">PAYMENT PROTOCOL</span>
+<button class="text-primary-fixed-dim font-label-caps text-[10px] flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-xs">call_split</span> SPLIT BILL
+                        </button>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl glass-panel border-primary-fixed-dim/20 hover:bg-primary-fixed-dim/10 transition-all group">
+<span class="material-symbols-outlined text-2xl text-on-surface-variant group-hover:text-primary-fixed-dim">credit_card</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">CREDIT/DEBIT</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 rounded-xl glass-panel border-secondary-container/20 hover:bg-secondary-container/10 transition-all group">
+<span class="material-symbols-outlined text-2xl text-on-surface-variant group-hover:text-secondary-fixed">contactless</span>
+<span class="font-label-caps text-[10px] text-on-surface-variant">NFC/DIGITAL</span>
+</button>
+</div>
+<button class="w-full py-4 liquid-gradient rounded-xl text-on-primary font-headline-lg text-lg font-bold shadow-[0_0_30px_rgba(0,219,233,0.3)] hover:shadow-[0_0_50px_rgba(0,219,233,0.5)] transition-all flex items-center justify-center gap-3 active:scale-95">
+<span class="material-symbols-outlined">payments</span>
+                        EXECUTE TRANSACTION
+                    </button>
+</div>
+</aside>
+</div>
+</main>
+<!-- Floating UI Decoration -->
+<div class="fixed bottom-10 left-80 pointer-events-none z-0">
+<div class="glass-panel p-4 rounded-xl flex gap-6 items-center border-primary-fixed-dim/20 opacity-40">
+<div class="flex flex-col">
+<span class="text-[8px] font-label-caps text-primary-fixed-dim">CPU CORE</span>
+<span class="text-xs font-data-point text-on-surface">32.4%</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[8px] font-label-caps text-secondary-fixed">NEURAL BAND</span>
+<span class="text-xs font-data-point text-on-surface">OPTIMAL</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[8px] font-label-caps text-error">UPTIME</span>
+<span class="text-xs font-data-point text-on-surface">99.9%</span>
+</div>
+</div>
+</div>
+</body></html>
