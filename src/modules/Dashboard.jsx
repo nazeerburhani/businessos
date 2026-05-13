@@ -76,27 +76,64 @@ export default function Dashboard() {
         </div>
 
         <div className="glass" style={{ padding: 20 }}>
-          <h3 style={{ marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <AlertTriangle size={16} color="var(--amber)" /> Stock Alerts
-          </h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, margin: 0 }}>
+              <AlertTriangle size={16} color="var(--amber)" /> Stock Alerts
+            </h3>
+            {lowStock.length > 0 && (
+              <span style={{ fontSize: '0.7rem', color: 'var(--amber)', fontWeight: 600, background: 'rgba(255,170,0,0.1)', padding: '2px 8px', borderRadius: 12 }}>
+                {lowStock.length} Action Needed
+              </span>
+            )}
+          </div>
+
           {lowStock.length === 0 ? (
             <div className="empty-state" style={{ padding: '30px 0' }}>
               <CheckCircle size={32} style={{ color: 'var(--emerald)', opacity: 0.4 }} />
-              <p>All stock levels healthy</p>
+              <p>Inventory is healthy</p>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {lowStock.map(p => (
-                <div key={p.id} className="card" style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem' }}>{p.name}</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--txt3)' }}>Min: {p.minStock}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 400, overflowY: 'auto', paddingRight: 4 }}>
+              {lowStock.map(p => {
+                const stockPercent = Math.min(100, (p.stock / (p.minStock * 2)) * 100);
+                const statusColor = p.stock === 0 ? 'var(--rose)' : 'var(--amber)';
+                
+                return (
+                  <div key={p.id} className="card" style={{ padding: '12px', borderLeft: `3px solid ${statusColor}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
+                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--txt)' }}>{p.name}</div>
+                      <span style={{ 
+                        fontSize: '0.65rem', 
+                        fontWeight: 900, 
+                        color: statusColor,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em'
+                      }}>
+                        {p.stock === 0 ? 'CRITICAL' : 'LOW'}
+                      </span>
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+                      <div style={{ flex: 1, height: 4, background: 'var(--border)', borderRadius: 10, overflow: 'hidden' }}>
+                        <div style={{ 
+                          height: '100%', 
+                          width: `${stockPercent}%`, 
+                          background: statusColor,
+                          boxShadow: `0 0 8px ${statusColor}44`
+                        }} />
+                      </div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600, minWidth: 45, textAlign: 'right' }}>
+                        {p.stock} / {p.minStock}
+                      </div>
+                    </div>
+                    
+                    <div style={{ fontSize: '0.65rem', color: 'var(--txt3)', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>SKU: {p.sku || 'N/A'}</span>
+                      <span>Min Required: {p.minStock}</span>
+                    </div>
                   </div>
-                  <span className={`badge ${p.stock === 0 ? 'badge-danger' : 'badge-warning'}`}>
-                    {p.stock === 0 ? 'OUT' : `${p.stock} left`}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
