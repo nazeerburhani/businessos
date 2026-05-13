@@ -10,6 +10,11 @@ export default function AiAssistant() {
     { role: 'bot', text: 'Hello! I am your BusinessOS AI assistant. Ask me about sales, stock, expenses, or profits. Developed by Nazeer Ahmad.' }
   ]);
 
+  React.useEffect(() => {
+    const list = document.getElementById('ai-messages-list');
+    if (list) list.scrollTop = list.scrollHeight;
+  }, [messages, open]);
+
   const send = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -44,14 +49,22 @@ export default function AiAssistant() {
             </div>
             <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex' }}><X size={16} /></button>
           </div>
-          <div className="ai-messages">
+          <div className="ai-messages" id="ai-messages-list">
             {messages.map((m, i) => (
               <div key={i} className={`ai-msg ${m.role}`}>{m.text}</div>
             ))}
           </div>
           <form className="ai-input-row" onSubmit={send}>
-            <input className="input" style={{ flex: 1, padding: '8px 12px' }} placeholder="Ask anything…" value={input} onChange={e => setInput(e.target.value)} />
-            <button type="submit" className="btn btn-primary btn-icon"><Send size={15} /></button>
+            <input 
+              className="input" 
+              placeholder="Ask anything…" 
+              value={input} 
+              onChange={e => setInput(e.target.value)} 
+              autoFocus
+            />
+            <button type="submit" className="btn btn-primary btn-icon">
+              <Send size={15} />
+            </button>
           </form>
           <div style={{ textAlign: 'center', padding: '4px', fontSize: '0.6rem', color: 'var(--txt3)' }}>Developed By Nazeer Ahmad</div>
         </div>

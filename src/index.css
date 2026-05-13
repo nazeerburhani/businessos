@@ -297,7 +297,9 @@ a { text-decoration:none; }
 .ai-msg { padding:10px 14px; border-radius:14px; max-width:85%; font-size:0.82rem; line-height:1.5; }
 .ai-msg.bot { background:rgba(255,255,255,0.05); border:1px solid var(--border); align-self:flex-start; }
 .ai-msg.user { background:var(--cyan-s); border:1px solid rgba(0,200,240,0.25); align-self:flex-end; }
-.ai-input-row { padding:10px; border-top:1px solid var(--border); display:flex; gap:8px; }
+.ai-input-row { padding:12px; border-top:1px solid var(--border); display:flex; gap:10px; align-items:center; background:var(--bg); }
+.ai-input-row .input { border-radius:10px; border:1px solid var(--border); }
+.ai-input-row .btn-icon { flex-shrink: 0; width: 38px; height: 38px; }
 
 /* UTIL */
 .text-cyan { color:var(--cyan); }
