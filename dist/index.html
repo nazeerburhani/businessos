@@ -7,11 +7,25 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="description" content="BusinessOS — Professional shop management for billing, inventory, khata and reports." />
+    <link rel="manifest" href="/assets/manifest-DuHbyvkD.json" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
     <title>BusinessOS — Enterprise Suite</title>
-    <script type="module" crossorigin src="/assets/index-DMR5lSbC.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Bg55NxB6.css">
+    <script type="module" crossorigin src="/assets/index-BQ0XP3S_.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BdN78VB3.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Register Service Worker for offline support
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(r => console.log('[SW] Registered:', r.scope))
+            .catch(e => console.log('[SW] Error:', e));
+        });
+      }
+    </script>
   </body>
 </html>
+

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap');
 
 :root {
   --bg: #070a14;
@@ -17,6 +17,71 @@
   --r: 10px; --r-lg: 16px; --r-xl: 24px;
   --t: all 0.2s ease;
 }
+
+/* ── Light Theme ─────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #f0f4f8;
+  --bg-surface: rgba(255,255,255,0.97);
+  --bg-card: rgba(255,255,255,0.9);
+  --bg-input: rgba(0,0,0,0.04);
+  --txt: #0f172a; --txt2: #334155; --txt3: #64748b;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
+}
+[data-theme="light"] body {
+  background: #f0f4f8;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 5% 15%, rgba(0,200,240,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 70% at 95% 85%, rgba(139,92,246,0.06) 0%, transparent 50%);
+}
+[data-theme="light"] .glass {
+  background: rgba(255,255,255,0.85);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.07);
+}
+[data-theme="light"] .card {
+  background: rgba(255,255,255,0.95);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+[data-theme="light"] .sidebar {
+  background: rgba(255,255,255,0.97);
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .topbar {
+  background: rgba(255,255,255,0.92);
+  border-color: rgba(0,0,0,0.08);
+}
+[data-theme="light"] .input,
+[data-theme="light"] .select-input,
+[data-theme="light"] .textarea-input {
+  background: rgba(0,0,0,0.04);
+  border-color: rgba(0,0,0,0.12);
+  color: var(--txt);
+}
+[data-theme="light"] .tbl th {
+  background: rgba(0,0,0,0.04);
+  color: var(--txt3);
+}
+[data-theme="light"] .tbl tr:hover td { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .bottom-nav { background: rgba(255,255,255,0.97); border-color: rgba(0,0,0,0.08); }
+[data-theme="light"] .modal-overlay { background: rgba(0,0,0,0.35); }
+[data-theme="light"] .modal-box { background: #fff; border-color: rgba(0,0,0,0.1); }
+[data-theme="light"] .ai-panel { background: rgba(255,255,255,0.97) !important; }
+
+/* ── RTL / Urdu Support ──────────────────────────────────────────────────── */
+[dir="rtl"] body { font-family: 'Noto Nastaliq Urdu', 'Inter', sans-serif; }
+[dir="rtl"] .sidebar { border-right: none; border-left: 1px solid var(--border); left: unset; right: 0; }
+[dir="rtl"] .main-content { margin-left: 0; margin-right: var(--sidebar-w); }
+[dir="rtl"] .page-header { flex-direction: row-reverse; }
+[dir="rtl"] .stat-card-top { flex-direction: row-reverse; }
+[dir="rtl"] .tbl th, [dir="rtl"] .tbl td { text-align: right; }
+[dir="rtl"] .modal-foot { flex-direction: row-reverse; }
+[dir="rtl"] .bottom-nav { direction: rtl; }
+@media (max-width: 900px) {
+  [dir="rtl"] .main-content { margin-right: 0; }
+}
+
+
 
 *,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
 body {

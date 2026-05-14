@@ -1,6 +1,7 @@
-import React from 'react';
-import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star, Download } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
+import { useTranslation } from '../hooks/useTranslation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function StatCard({ label, value, icon: Icon, type, meta }) {
@@ -18,8 +19,24 @@ function StatCard({ label, value, icon: Icon, type, meta }) {
 
 export default function Dashboard({ setActiveTab }) {
   const { data, stats } = useBusiness();
+  const { t } = useTranslation();
   const cur = data.settings.currency;
   const fmt = (n) => `${cur} ${(n || 0).toLocaleString()}`;
+
+  // PWA install prompt
+  const [installPrompt, setInstallPrompt] = useState(null);
+  const [installBanner, setInstallBanner] = useState(false);
+  useEffect(() => {
+    const handler = (e) => { e.preventDefault(); setInstallPrompt(e); setInstallBanner(true); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+  const handleInstall = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === 'accepted') setInstallBanner(false);
+  };
 
   const chartData = data.transactions.slice(0, 14).reverse().map(t => ({
     date: t.date?.slice(5) || '',
@@ -67,13 +84,26 @@ export default function Dashboard({ setActiveTab }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">Dashboard</h1>
-          <div className="page-subtitle">Welcome back — {data.settings.businessName}</div>
+          <div className="page-subtitle">{t('welcomeBack')} — {data.settings.businessName}</div>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>Net Profit</div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: stats.netProfit >= 0 ? 'var(--emerald)' : 'var(--rose)' }}>{fmt(stats.netProfit)}</div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>{t('netProfit')}</div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: stats.netProfit >= 0 ? 'var(--emerald)' : 'var(--rose)' }}>{fmt(stats.netProfit)}</div>
+          </div>
         </div>
-      </div>
+
+      {/* PWA Install Banner */}
+      {installBanner && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', marginBottom: 16, borderRadius: 12, background: 'linear-gradient(135deg, rgba(139,92,246,0.15), rgba(0,200,240,0.1))', border: '1px solid var(--violet-g)' }}>
+          <Download size={20} color="var(--violet)" style={{ flexShrink: 0 }} />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>Install BusinessOS App</div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>Add to Home Screen for offline access — works without internet!</div>
+          </div>
+          <button className="btn btn-primary btn-sm" style={{ fontSize: '0.78rem' }} onClick={handleInstall}>Install</button>
+          <button className="btn btn-ghost btn-sm btn-icon" onClick={() => setInstallBanner(false)}>×</button>
+        </div>
+      )}
 
       {/* ── Onboarding Banner ── */}
       {!onboardingDone && (
