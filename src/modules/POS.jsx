@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Minus, Trash2, Search, CheckCircle, Printer } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, Search, CheckCircle, Printer, X, Package } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
@@ -30,7 +30,7 @@ function Receipt({ txn, settings, onClose }) {
           <span>TOTAL</span>
           <span>{settings.currency} {txn.total?.toLocaleString()}</span>
         </div>
-        <div className="receipt-row" style={{ marginTop: 8 }}><span>Payment</span><span>{txn.paymentMethod}</span></div>
+        <div className="receipt-row" style={{ marginTop: 8 }}><span>Payment</span><span style={{ textTransform: 'capitalize' }}>{txn.paymentMethod}</span></div>
         <div className="receipt-footer">{settings.receiptFooter}<br /><strong>Developed by Nazeer Ahmad</strong></div>
       </div>
       <div className="modal-foot">
@@ -45,25 +45,27 @@ function Receipt({ txn, settings, onClose }) {
 
 export default function POS({ searchQuery }) {
   const { data, addTransaction } = useBusiness();
-  const { products, settings } = data;
+  const { products, settings, khata } = data;
   const cur = settings.currency;
+  
   const [cart, setCart] = useState([]);
   const [discount, setDiscount] = useState(0);
   const [discountType, setDiscountType] = useState('%');
-  const [paymentMethod, setPaymentMethod] = useState('Cash');
+  const [paymentMethod, setPaymentMethod] = useState('cash'); // cash, bank, khata
+  const [selectedCustomer, setSelectedCustomer] = useState('');
   const [catFilter, setCatFilter] = useState('All');
   const [receipt, setReceipt] = useState(null);
-  const [note, setNote] = useState('');
 
   const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
   const filtered = products.filter(p => {
-    const matchQ = p.name?.toLowerCase().includes(searchQuery?.toLowerCase() || '');
+    const s = searchQuery?.toLowerCase() || '';
+    const matchQ = p.name?.toLowerCase().includes(s) || p.sku?.toLowerCase().includes(s);
     const matchC = catFilter === 'All' || p.category === catFilter;
     return matchQ && matchC;
   });
 
   const addToCart = (p) => {
-    if (p.stock === 0) return;
+    if (p.stock <= 0) return;
     setCart(prev => {
       const ex = prev.find(i => i.id === p.id);
       if (ex) {
@@ -75,129 +77,148 @@ export default function POS({ searchQuery }) {
   };
 
   const updateQty = (id, delta) => {
-    setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
+    setCart(prev => prev.map(i => {
+      if (i.id !== id) return i;
+      const p = products.find(prod => prod.id === id);
+      const newQty = Math.max(1, i.qty + delta);
+      return newQty <= (p?.stock || 0) ? { ...i, qty: newQty } : i;
+    }));
   };
 
-  const removeFromCart = (id) => setCart(prev => prev.filter(i => i.id !== id));
-
   const subtotal = cart.reduce((a, i) => a + i.price * i.qty, 0);
-  const discountAmt = discountType === '%' ? Math.round(subtotal * discount / 100) : Number(discount);
+  const discountAmt = discountType === '%' ? Math.round(subtotal * Number(discount || 0) / 100) : Number(discount || 0);
   const taxAmt = Math.round((subtotal - discountAmt) * settings.taxRate / 100);
   const total = subtotal - discountAmt + taxAmt;
 
   const checkout = () => {
     if (!cart.length) return;
-    const txn = { items: cart, subtotal, discount: discountAmt, taxRate: settings.taxRate, tax: taxAmt, total, paymentMethod, note };
+    if (paymentMethod === 'khata' && !selectedCustomer) {
+      alert('Please select a customer for Khata sale.');
+      return;
+    }
+
+    const txn = { 
+      items: cart, 
+      subtotal, 
+      discount: discountAmt, 
+      taxRate: settings.taxRate, 
+      tax: taxAmt, 
+      total, 
+      paymentMethod,
+      customerId: paymentMethod === 'khata' ? Number(selectedCustomer) : null
+    };
+    
     addTransaction(txn);
     setReceipt(txn);
-    setCart([]); setDiscount(0); setNote('');
+    setCart([]);
+    setDiscount(0);
+    setSelectedCustomer('');
   };
 
   return (
-    <div className="page-body anim-fade" style={{ paddingBottom: 0 }}>
-      <div className="page-header" style={{ marginBottom: 16 }}>
-        <div>
-          <h1 className="page-title">Point of Sale</h1>
-          <div className="page-subtitle">Select products and complete the transaction</div>
-        </div>
-      </div>
-
+    <div className="page-body anim-fade">
       <div className="pos-layout">
-        {/* Products */}
-        <div className="glass" style={{ padding: 16, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Products Grid */}
+        <div className="glass" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {categories.map(c => (
               <button key={c} className={`btn btn-sm ${catFilter === c ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setCatFilter(c)}>{c}</button>
             ))}
           </div>
-          {filtered.length === 0 ? (
-            <div className="empty-state"><ShoppingCart size={40} /><p>No products found. Add products in Inventory.</p></div>
-          ) : (
-            <div className="pos-products" style={{ flex: 1 }}>
-              {filtered.map(p => (
-                <div key={p.id} className={`card pos-product-card ${p.stock === 0 ? 'out-of-stock' : ''}`} onClick={() => addToCart(p)}>
-                  <div style={{ fontWeight: 600, marginBottom: 6 }}>{p.name}</div>
-                  <div style={{ color: 'var(--cyan)', fontSize: '1.15rem', fontWeight: 800, marginBottom: 6 }}>{cur} {p.price?.toLocaleString()}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span className={`badge ${p.stock === 0 ? 'badge-danger' : p.stock <= p.minStock ? 'badge-warning' : 'badge-success'}`}>
-                      {p.stock === 0 ? 'Out of Stock' : `${p.stock} in stock`}
-                    </span>
-                    {p.stock > 0 && <Plus size={16} color="var(--cyan)" />}
-                  </div>
-                  {p.category && <div style={{ marginTop: 6, fontSize: '0.7rem', color: 'var(--txt3)' }}>{p.category}{p.sku ? ` · ${p.sku}` : ''}</div>}
+          <div className="pos-products" style={{ flex: 1 }}>
+            {filtered.length === 0 ? (
+              <div className="empty-state" style={{ gridColumn: '1/-1' }}><ShoppingCart size={40} /><p>No products found</p></div>
+            ) : filtered.map(p => (
+              <div key={p.id} className={`card pos-product-card ${p.stock <= 0 ? 'out-of-stock' : ''}`} onClick={() => addToCart(p)}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <span className="badge badge-primary" style={{ fontSize: '0.65rem' }}>{p.category}</span>
+                  <span className={`badge ${p.stock <= p.minStock ? 'badge-warning' : 'badge-success'}`}>{p.stock} left</span>
                 </div>
-              ))}
-            </div>
-          )}
+                <div style={{ fontWeight: 800, fontSize: '0.95rem', marginBottom: 4 }}>{p.name}</div>
+                <div style={{ color: 'var(--cyan)', fontWeight: 900 }}>{cur} {p.price?.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Cart */}
-        <div className="glass pos-cart" style={{ padding: 18 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-            <h3 style={{ display: 'flex', alignItems: 'center', gap: 8 }}><ShoppingCart size={16} /> Cart</h3>
-            {cart.length > 0 && <button className="btn btn-sm" style={{ color: 'var(--rose)', background: 'none', border: 'none' }} onClick={() => setCart([])}>Clear All</button>}
+        {/* Cart Panel */}
+        <div className="glass pos-cart">
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3 style={{ margin: 0 }}>Current Cart</h3>
+            <button className="btn btn-ghost btn-sm" onClick={() => setCart([])}>Clear</button>
           </div>
 
           <div className="pos-cart-items">
             {cart.length === 0 ? (
-              <div className="empty-state" style={{ paddingTop: 40 }}><ShoppingCart size={40} /><p>Tap a product to add</p></div>
-            ) : (
-              cart.map(item => (
-                <div key={item.id} className="pos-cart-item">
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>{cur} {item.price?.toLocaleString()} each</div>
-                  </div>
-                  <div className="qty-ctrl">
-                    <button className="qty-btn" onClick={() => updateQty(item.id, -1)}><Minus size={12} /></button>
-                    <span style={{ fontWeight: 700, minWidth: 22, textAlign: 'center' }}>{item.qty}</span>
-                    <button className="qty-btn" onClick={() => updateQty(item.id, 1)}><Plus size={12} /></button>
-                  </div>
-                  <div style={{ textAlign: 'right', minWidth: 70 }}>
-                    <div style={{ fontWeight: 700, color: 'var(--cyan)', fontSize: '0.9rem' }}>{cur} {(item.price * item.qty).toLocaleString()}</div>
-                    <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', color: 'var(--rose)', cursor: 'pointer', marginTop: 2, display: 'flex' }}><Trash2 size={13} /></button>
-                  </div>
+              <div className="empty-state" style={{ padding: '40px 0' }}><ShoppingCart size={32} /><p>Cart is empty</p></div>
+            ) : cart.map(item => (
+              <div key={item.id} className="pos-cart-item">
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{item.name}</div>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--cyan)' }}>{cur} {item.price.toLocaleString()}</div>
                 </div>
-              ))
-            )}
+                <div className="qty-ctrl">
+                  <button className="qty-btn" onClick={() => updateQty(item.id, -1)}>-</button>
+                  <span style={{ minWidth: 20, textAlign: 'center', fontWeight: 800 }}>{item.qty}</span>
+                  <button className="qty-btn" onClick={() => updateQty(item.id, 1)}>+</button>
+                </div>
+                <button className="btn btn-icon" style={{ color: 'var(--rose)', padding: 4 }} onClick={() => setCart(cart.filter(i => i.id !== item.id))}><Trash2 size={14} /></button>
+              </div>
+            ))}
           </div>
 
           <div className="pos-checkout">
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 12 }}>
-              <div className="input-wrap">
-                <label className="input-label">Discount</label>
+            {/* Payment Method Selector */}
+            <div style={{ padding: '0 20px 12px' }}>
+              <div className="input-label" style={{ marginBottom: 6 }}>Payment Account</div>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {['cash', 'bank', 'khata'].map(m => (
+                  <button 
+                    key={m} 
+                    className={`btn btn-sm ${paymentMethod === m ? 'btn-primary' : 'btn-ghost'}`}
+                    style={{ flex: 1, textTransform: 'capitalize' }}
+                    onClick={() => setPaymentMethod(m)}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {paymentMethod === 'khata' && (
+              <div style={{ padding: '0 20px 12px' }}>
+                <select className="select-input" value={selectedCustomer} onChange={e => setSelectedCustomer(e.target.value)} style={{ width: '100%' }}>
+                  <option value="">-- Select Customer --</option>
+                  {khata.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+            )}
+
+            <div style={{ padding: '0 20px 20px' }}>
+              <div className="checkout-line">
+                <span>Discount</span>
                 <div style={{ display: 'flex', gap: 4 }}>
-                  <input className="input" type="number" min="0" value={discount} onChange={e => setDiscount(e.target.value)} style={{ flex: 1 }} />
-                  <select className="select-input" style={{ width: 55 }} value={discountType} onChange={e => setDiscountType(e.target.value)}>
-                    <option value="%">%</option><option value="flat">Flat</option>
+                  <input type="number" className="input" style={{ width: 60, height: 28, padding: '2px 8px' }} value={discount} onChange={e => setDiscount(e.target.value)} />
+                  <select className="select-input" style={{ width: 45, height: 28 }} value={discountType} onChange={e => setDiscountType(e.target.value)}>
+                    <option>%</option><option>flat</option>
                   </select>
                 </div>
               </div>
-              <div className="input-wrap">
-                <label className="input-label">Payment</label>
-                <select className="select-input" value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                  <option>Cash</option><option>Card</option><option>Online</option><option>Cheque</option>
-                </select>
+              <div className="checkout-line"><span>Subtotal</span><span>{cur} {subtotal.toLocaleString()}</span></div>
+              {taxAmt > 0 && <div className="checkout-line"><span>Tax ({settings.taxRate}%)</span><span>{cur} {taxAmt.toLocaleString()}</span></div>}
+              <div className="checkout-line checkout-total" style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--border2)' }}>
+                <span>Total</span><span>{cur} {total.toLocaleString()}</span>
               </div>
+              <button className="btn btn-primary w-full btn-lg" style={{ marginTop: 14 }} onClick={checkout} disabled={!cart.length}>
+                <CheckCircle size={18} /> Complete Sale
+              </button>
             </div>
-
-            <div className="checkout-line"><span>Subtotal</span><span>{cur} {subtotal.toLocaleString()}</span></div>
-            {discountAmt > 0 && <div className="checkout-line" style={{ color: 'var(--emerald)' }}><span>Discount</span><span>- {cur} {discountAmt.toLocaleString()}</span></div>}
-            {taxAmt > 0 && <div className="checkout-line"><span>Tax ({settings.taxRate}%)</span><span>{cur} {taxAmt.toLocaleString()}</span></div>}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 }}>
-              <span style={{ fontWeight: 700 }}>TOTAL</span>
-              <span className="checkout-total">{cur} {total.toLocaleString()}</span>
-            </div>
-
-            <button className="btn btn-success w-full btn-lg" style={{ marginTop: 14 }} disabled={!cart.length} onClick={checkout}>
-              <CheckCircle size={18} /> Complete Sale
-            </button>
           </div>
         </div>
       </div>
 
-      <Modal isOpen={!!receipt} onClose={() => setReceipt(null)} title="Transaction Complete">
-        {receipt && <Receipt txn={receipt} settings={settings} onClose={() => setReceipt(null)} />}
+      <Modal isOpen={!!receipt} onClose={() => setReceipt(null)} title="Print Receipt">
+        <Receipt txn={receipt} settings={settings} onClose={() => setReceipt(null)} />
       </Modal>
     </div>
   );

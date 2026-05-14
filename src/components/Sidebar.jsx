@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp } from 'lucide-react';
+import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp, Truck } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
@@ -10,6 +10,7 @@ const navGroups = [
       { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, color: 'c' },
       { id: 'pos', label: 'Point of Sale', icon: ShoppingCart, color: 'c' },
       { id: 'inventory', label: 'Inventory', icon: Package, color: 'e', badgeKey: 'stock' },
+      { id: 'suppliers', label: 'Suppliers', icon: Truck, color: 'a' },
     ]
   },
   {

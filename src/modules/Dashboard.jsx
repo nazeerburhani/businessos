@@ -43,10 +43,10 @@ export default function Dashboard() {
       </div>
 
       <div className="stat-grid">
-        <StatCard label="Total Revenue" value={fmt(stats.totalRevenue)} icon={TrendingUp} type="c" meta={`${data.transactions.length} transactions`} />
-        <StatCard label="Total Expenses" value={fmt(stats.totalExpenses)} icon={CreditCard} type="r" meta={`${data.expenses.length} entries`} />
-        <StatCard label="Khata Pending" value={fmt(stats.pendingKhata)} icon={BookOpen} type="a" meta={`${data.khata.length} customers`} />
-        <StatCard label="Stock Alerts" value={`${stats.outOfStockCount} Out / ${stats.lowStockCount} Low`} icon={Package} type="e" meta={`${data.products.length} products total`} />
+        <StatCard label="Total Revenue" value={fmt(stats.totalRevenue)} icon={TrendingUp} type="c" meta={`${data.transactions.length} sales`} />
+        <StatCard label="Cash in Hand" value={fmt(stats.cashBalance)} icon={DollarSign} type="e" meta="Available cash" />
+        <StatCard label="Bank Balance" value={fmt(stats.bankBalance)} icon={CreditCard} type="c" meta="In accounts" />
+        <StatCard label="Pending Khata" value={fmt(stats.pendingKhata)} icon={BookOpen} type="a" meta={`${data.khata.length} customers`} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 20, marginBottom: 20 }}>

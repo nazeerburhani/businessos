@@ -147,6 +147,25 @@ export default function SettingsModule() {
           </div>
         </div>
 
+        {/* Bank Details */}
+        <div className="glass" style={{ padding: 24 }}>
+          <h3 style={{ marginBottom: 20, color: 'var(--cyan)' }}>Bank Details</h3>
+          <div className="grid-2">
+            <div className="input-wrap">
+              <label className="input-label">Bank Name</label>
+              <input className="input" name="bankName" value={form.bankDetails?.name || ''} onChange={e => setForm({...form, bankDetails: {...form.bankDetails, name: e.target.value}})} placeholder="e.g. HDFC Bank" />
+            </div>
+            <div className="input-wrap">
+              <label className="input-label">Account Number</label>
+              <input className="input" name="accountNumber" value={form.bankDetails?.account || ''} onChange={e => setForm({...form, bankDetails: {...form.bankDetails, account: e.target.value}})} placeholder="0000 1111 2222" />
+            </div>
+          </div>
+          <div className="input-wrap" style={{ marginTop: 16 }}>
+            <label className="input-label">Branch & IFSC</label>
+            <input className="input" name="branch" value={form.bankDetails?.branch || ''} onChange={e => setForm({...form, bankDetails: {...form.bankDetails, branch: e.target.value}})} placeholder="Main Branch, XYZ123" />
+          </div>
+        </div>
+
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <button type="button" className="btn btn-sm" style={{ background: 'var(--rose-s)', border: '1px solid var(--rose-g)', color: 'var(--rose)' }} onClick={() => setResetModal(true)}>
             <Trash2 size={14} /> Reset All Data

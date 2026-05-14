@@ -13,6 +13,8 @@ export default function Inventory({ searchQuery }) {
   const [form, setForm] = useState(emptyForm);
   const [catFilter, setCatFilter] = useState('All');
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [isAdjModalOpen, setIsAdjModalOpen] = useState(false);
+  const [adjProd, setAdjProd] = useState(null);
 
   const filtered = products.filter(p => {
     const q = (searchQuery || '').toLowerCase();
@@ -23,11 +25,19 @@ export default function Inventory({ searchQuery }) {
 
   const openAdd = () => { setForm(emptyForm); setModal(true); };
   const openEdit = (p) => { setForm({ ...p }); setModal(true); };
+  const openAdjust = (p) => { setAdjProd(p); setIsAdjModalOpen(true); };
 
   const handleSave = (e) => {
     e.preventDefault();
     saveProduct({ ...form, price: Number(form.price), costPrice: Number(form.costPrice), stock: Number(form.stock), minStock: Number(form.minStock) });
     setModal(false);
+  };
+
+  const handleAdjust = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    adjustStock(adjProd.id, Number(formData.get('qty')), formData.get('reason'));
+    setIsAdjModalOpen(false);
   };
 
   const confirmDelete = (id) => { deleteProduct(id); setDeleteConfirm(null); };
@@ -85,6 +95,7 @@ export default function Inventory({ searchQuery }) {
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: 6 }}>
+                        <button className="btn btn-ghost btn-sm" onClick={() => openAdjust(p)} style={{ color: 'var(--amber)' }}>Adjust</button>
                         <button className="btn btn-ghost btn-sm btn-icon" onClick={() => openEdit(p)}><Edit2 size={14} /></button>
                         <button className="btn btn-sm btn-icon" style={{ background: 'var(--rose-s)', border: '1px solid var(--rose-g)', color: 'var(--rose)' }} onClick={() => setDeleteConfirm(p.id)}><Trash2 size={14} /></button>
                       </div>
@@ -159,6 +170,35 @@ export default function Inventory({ searchQuery }) {
           <button className="btn btn-ghost" onClick={() => setDeleteConfirm(null)}>Cancel</button>
           <button className="btn btn-danger" onClick={() => confirmDelete(deleteConfirm)}>Delete</button>
         </div>
+      </Modal>
+
+      {/* Adjustment Modal */}
+      <Modal isOpen={isAdjModalOpen} onClose={() => setIsAdjModalOpen(false)} title="Adjust Stock">
+        <form onSubmit={handleAdjust}>
+          <div className="modal-body">
+            <div style={{ marginBottom: 16, padding: 12, background: 'rgba(0,200,240,0.05)', borderRadius: 8, fontSize: '0.85rem' }}>
+              <strong>Adjusting:</strong> {adjProd?.name} <br/>
+              <strong>Current:</strong> {adjProd?.stock} {adjProd?.unit}
+            </div>
+            <div className="input-wrap">
+              <label className="input-label">Adjustment Quantity (+/-)</label>
+              <input className="input" name="qty" type="number" required placeholder="e.g. 10 or -5" />
+            </div>
+            <div className="input-wrap mt-4">
+              <label className="input-label">Reason</label>
+              <select className="select-input" name="reason" required>
+                <option value="Restock">Restock / New Purchase</option>
+                <option value="Damage">Damage / Expired</option>
+                <option value="Return">Customer Return</option>
+                <option value="Correction">Data Correction</option>
+              </select>
+            </div>
+          </div>
+          <div className="modal-foot">
+            <button type="button" className="btn btn-ghost" onClick={() => setIsAdjModalOpen(false)}>Cancel</button>
+            <button type="submit" className="btn btn-primary">Confirm Adjustment</button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

@@ -1,32 +1,39 @@
 import React from 'react';
-import { LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, MoreHorizontal } from 'lucide-react';
-
-const bottomNav = [
-  { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
-  { id: 'pos', label: 'POS', icon: ShoppingCart },
-  { id: 'inventory', label: 'Stock', icon: Package },
-  { id: 'khata', label: 'Khata', icon: BookOpen },
-  { id: 'expenses', label: 'More', icon: MoreHorizontal },
-];
+import { LayoutDashboard, ShoppingCart, Package, BookOpen, Truck, Users, CreditCard, BarChart2, Settings } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
+  const tabs = [
+    { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
+    { id: 'pos', label: 'POS', icon: ShoppingCart },
+    { id: 'inventory', label: 'Stock', icon: Package },
+    { id: 'khata', label: 'Khata', icon: BookOpen },
+    { id: 'suppliers', label: 'Supply', icon: Truck },
+    { id: 'employees', label: 'Staff', icon: Users },
+    { id: 'expenses', label: 'Exp.', icon: CreditCard },
+    { id: 'analytics', label: 'Stats', icon: BarChart2 },
+    { id: 'settings', label: 'Set.', icon: Settings },
+  ];
+
   return (
     <nav className="bottom-nav">
-      {bottomNav.map(item => {
-        const Icon = item.icon;
-        const isActive = activeTab === item.id ||
-          (item.id === 'expenses' && ['expenses', 'analytics', 'employees', 'settings'].includes(activeTab));
-        return (
-          <button
-            key={item.id}
-            className={`bottom-nav-item ${isActive ? 'active' : ''}`}
-            onClick={() => setActiveTab(item.id)}
-          >
-            <Icon size={22} />
-            <span>{item.label}</span>
-          </button>
-        );
-      })}
+      <div className="bottom-nav-inner">
+        {tabs.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              className={`nav-tab ${isActive ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <div className={`nav-tab-icon ${isActive ? 'active' : ''}`}>
+                <Icon size={18} />
+              </div>
+              <span className="nav-tab-label">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }

@@ -9,11 +9,21 @@ const initialData = {
     address: '', phone: '', email: '',
     taxRate: 0, currency: 'Rs.',
     receiptFooter: 'Thank you for your business!',
-    logoUrl: '', // base64 or URL
+    logoUrl: '',
     businessHours: '', website: '',
+    bankDetails: { name: '', account: '', branch: '' }
   },
-  products: [], khata: [], employees: [],
-  expenses: [], transactions: [],
+  accounts: {
+    cash: 0,
+    bank: 0,
+  },
+  products: [], 
+  khata: [], 
+  suppliers: [],
+  employees: [],
+  expenses: [], 
+  transactions: [],
+  stockHistory: [],
   categories: ['General', 'Electronics', 'Clothing', 'Food & Beverage', 'Services', 'Other'],
 };
 
@@ -23,8 +33,10 @@ export function BusinessProvider({ children }) {
       const s = localStorage.getItem(STORAGE_KEY);
       if (s) {
         const parsed = JSON.parse(s);
-        // Merge new settings fields into existing data
         parsed.settings = { ...initialData.settings, ...(parsed.settings || {}) };
+        parsed.accounts = { ...initialData.accounts, ...(parsed.accounts || {}) };
+        parsed.suppliers = parsed.suppliers || [];
+        parsed.stockHistory = parsed.stockHistory || [];
         return parsed;
       }
       return initialData;
@@ -39,8 +51,17 @@ export function BusinessProvider({ children }) {
     const pendingKhata = data.khata.reduce((a, k) => a + (k.balance > 0 ? k.balance : 0), 0);
     const lowStockCount = data.products.filter(p => p.stock > 0 && p.stock <= (p.minStock || 5)).length;
     const outOfStockCount = data.products.filter(p => p.stock === 0).length;
+    
+    // Account balances
+    const cashBalance = data.accounts.cash;
+    const bankBalance = data.accounts.bank;
     const netProfit = totalRevenue - totalExpenses;
-    return { totalRevenue, totalExpenses, pendingKhata, lowStockCount, outOfStockCount, netProfit };
+    
+    return { 
+      totalRevenue, totalExpenses, pendingKhata, 
+      lowStockCount, outOfStockCount, netProfit,
+      cashBalance, bankBalance 
+    };
   }, [data]);
 
   const saveProduct = (product) => setData(prev => ({
@@ -50,27 +71,54 @@ export function BusinessProvider({ children }) {
       : [...prev.products, { ...product, id: Date.now() }]
   }));
 
-  const deleteProduct = (id) => setData(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id) }));
-
-  const addTransaction = (txn) => {
+  const adjustStock = (productId, qty, reason) => {
     setData(prev => ({
       ...prev,
-      transactions: [{ ...txn, id: Date.now(), date: new Date().toISOString().split('T')[0] }, ...prev.transactions],
-      products: prev.products.map(p => {
-        const item = txn.items?.find(ci => ci.id === p.id);
-        return item ? { ...p, stock: Math.max(0, p.stock - item.qty) } : p;
-      }),
+      products: prev.products.map(p => p.id === productId ? { ...p, stock: p.stock + qty } : p),
+      stockHistory: [{ id: Date.now(), productId, qty, reason, date: new Date().toISOString() }, ...prev.stockHistory]
     }));
   };
 
-  const saveKhataCustomer = (c) => setData(prev => ({
+  const deleteProduct = (id) => setData(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id) }));
+
+  const addTransaction = (txn) => {
+    // txn: { items, subtotal, tax, discount, total, paymentMethod, customerId }
+    setData(prev => {
+      const newAccounts = { ...prev.accounts };
+      const newKhata = [...prev.khata];
+      
+      if (txn.paymentMethod === 'cash') newAccounts.cash += txn.total;
+      else if (txn.paymentMethod === 'bank') newAccounts.bank += txn.total;
+      else if (txn.paymentMethod === 'khata' && txn.customerId) {
+        const idx = newKhata.findIndex(k => k.id === txn.customerId);
+        if (idx > -1) {
+          newKhata[idx] = { 
+            ...newKhata[idx], 
+            balance: newKhata[idx].balance + txn.total,
+            history: [{ id: Date.now(), date: new Date().toISOString().split('T')[0], amount: txn.total, type: 'debt', desc: 'POS Sale' }, ...(newKhata[idx].history || [])]
+          };
+        }
+      }
+
+      return {
+        ...prev,
+        transactions: [{ ...txn, id: Date.now(), date: new Date().toISOString().split('T')[0] }, ...prev.transactions],
+        accounts: newAccounts,
+        khata: newKhata,
+        products: prev.products.map(p => {
+          const item = txn.items?.find(ci => ci.id === p.id);
+          return item ? { ...p, stock: Math.max(0, p.stock - item.qty) } : p;
+        }),
+      };
+    });
+  };
+
+  const saveSupplier = (sup) => setData(prev => ({
     ...prev,
-    khata: c.id
-      ? prev.khata.map(k => k.id === c.id ? c : k)
-      : [{ ...c, id: Date.now(), balance: 0, history: [] }, ...prev.khata]
+    suppliers: sup.id ? prev.suppliers.map(s => s.id === sup.id ? sup : s) : [...prev.suppliers, { ...sup, id: Date.now(), balance: 0 }]
   }));
 
-  const deleteKhataCustomer = (id) => setData(prev => ({ ...prev, khata: prev.khata.filter(k => k.id !== id) }));
+  const deleteSupplier = (id) => setData(prev => ({ ...prev, suppliers: prev.suppliers.filter(s => s.id !== id) }));
 
   const addKhataEntry = (customerId, amount, type, desc) => {
     const amt = Number(amount);
@@ -134,8 +182,9 @@ export function BusinessProvider({ children }) {
   return (
     <BusinessContext.Provider value={{
       data, stats,
-      saveProduct, deleteProduct, addTransaction,
+      saveProduct, deleteProduct, adjustStock, addTransaction,
       saveKhataCustomer, deleteKhataCustomer, addKhataEntry,
+      saveSupplier, deleteSupplier,
       saveEmployee, deleteEmployee, markAttendance, processPayroll,
       saveExpense, deleteExpense,
       saveSettings, resetData,
