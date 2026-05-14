@@ -23,6 +23,21 @@ export default function Staff() {
 
   const totalPayroll = employees.reduce((a, e) => a + (e.salary || 0), 0);
 
+  // Monthly attendance summary per employee
+  const thisMonth = today.slice(0, 7);
+  const getMonthAttendance = (emp) => {
+    const monthAttendance = (emp.attendance || []).filter(a => a.date?.startsWith(thisMonth));
+    const present = monthAttendance.filter(a => a.status === 'present').length;
+    const absent  = monthAttendance.filter(a => a.status === 'absent').length;
+    const leave   = monthAttendance.filter(a => a.status === 'leave').length;
+    const total   = monthAttendance.length;
+    const pct     = total > 0 ? Math.round((present / total) * 100) : null;
+    // Deduction: absent days * (salary / 30)
+    const perDay  = (emp.salary || 0) / 30;
+    const deduction = Math.round(absent * perDay);
+    return { present, absent, leave, total, pct, deduction };
+  };
+
   return (
     <div className="page-body anim-fade">
       <div className="page-header">
@@ -53,6 +68,25 @@ export default function Staff() {
                 </div>
                 {emp.phone && <div style={{ fontSize: '0.75rem', color: 'var(--txt3)', marginBottom: 4 }}>{emp.phone}</div>}
                 {emp.joinDate && <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>Joined: {emp.joinDate}</div>}
+
+                {/* Monthly Attendance Summary */}
+                {(() => {
+                  const att = getMonthAttendance(emp);
+                  return att.total > 0 ? (
+                    <div style={{ margin: '10px 0', padding: '10px 12px', background: 'var(--bg-input)', borderRadius: 8 }}>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--txt3)', marginBottom: 6, fontWeight: 600 }}>THIS MONTH</div>
+                      <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
+                        <span style={{ fontSize: '0.72rem', background: 'var(--emerald-s)', color: 'var(--emerald)', padding: '2px 6px', borderRadius: 4 }}>✓ {att.present}P</span>
+                        <span style={{ fontSize: '0.72rem', background: 'var(--rose-s)', color: 'var(--rose)', padding: '2px 6px', borderRadius: 4 }}>✗ {att.absent}A</span>
+                        <span style={{ fontSize: '0.72rem', background: 'var(--amber-s)', color: 'var(--amber)', padding: '2px 6px', borderRadius: 4 }}>○ {att.leave}L</span>
+                        {att.pct !== null && <span style={{ fontSize: '0.72rem', color: 'var(--txt3)', marginLeft: 'auto' }}>{att.pct}%</span>}
+                      </div>
+                      {att.deduction > 0 && (
+                        <div style={{ fontSize: '0.72rem', color: 'var(--rose)' }}>Deduction: - {cur} {att.deduction.toLocaleString()} ({att.absent} absent days)</div>
+                      )}
+                    </div>
+                  ) : null;
+                })()}
 
                 {/* Today's Attendance */}
                 <div style={{ margin: '14px 0', padding: '10px 14px', background: 'var(--bg-input)', borderRadius: 'var(--r)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

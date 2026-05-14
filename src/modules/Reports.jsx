@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { FileText, Download, TrendingUp, TrendingDown, Calendar, DollarSign } from 'lucide-react';
+import { FileText, Download, TrendingUp, TrendingDown, Calendar, DollarSign, Printer } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
+import { generateInvoicePDF } from '../utils/invoicePDF';
 
 export default function Reports() {
   const { data, stats } = useBusiness();
@@ -233,10 +234,10 @@ export default function Reports() {
           </div>
           <div className="tbl-wrap">
             <table className="tbl">
-              <thead><tr><th>Date</th><th>Items</th><th>Subtotal</th><th>Tax</th><th>Total</th></tr></thead>
+              <thead><tr><th>Date</th><th>Items</th><th>Subtotal</th><th>Tax</th><th>Total</th><th>Invoice</th></tr></thead>
               <tbody>
                 {filteredTxns.filter(t => (t.tax || 0) > 0).length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign: 'center', padding: 40, color: 'var(--txt3)' }}>No taxed transactions in this period</td></tr>
+                  <tr><td colSpan={6} style={{ textAlign: 'center', padding: 40, color: 'var(--txt3)' }}>No taxed transactions in this period</td></tr>
                 ) : filteredTxns.filter(t => (t.tax || 0) > 0).map(t => (
                   <tr key={t.id}>
                     <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{t.date}</td>
@@ -244,6 +245,11 @@ export default function Reports() {
                     <td>{cur} {(t.subtotal || 0).toLocaleString()}</td>
                     <td style={{ color: 'var(--amber)', fontWeight: 700 }}>{cur} {(t.tax || 0).toLocaleString()}</td>
                     <td style={{ color: 'var(--cyan)', fontWeight: 700 }}>{cur} {(t.total || 0).toLocaleString()}</td>
+                    <td>
+                      <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.68rem', color: 'var(--violet)' }} onClick={() => generateInvoicePDF(t, settings)}>
+                        <Printer size={11} /> PDF
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

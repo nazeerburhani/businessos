@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen, Camera } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen, Camera, FileDown } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 import BarcodeScanner from '../components/BarcodeScanner';
+import { generateInvoicePDF } from '../utils/invoicePDF';
 
 // ─── RECEIPT COMPONENT ────────────────────────────────────────────────────────
 function Receipt({ txn, settings, onClose }) {
@@ -54,6 +55,9 @@ function Receipt({ txn, settings, onClose }) {
       </div>
       <div className="modal-foot">
         <button className="btn btn-ghost" onClick={onClose}>Close</button>
+        <button className="btn btn-ghost" style={{ color: 'var(--violet)', border: '1px solid var(--violet-g)', background: 'var(--violet-s)' }} onClick={() => generateInvoicePDF(txn, settings)}>
+          <FileDown size={15} /> PDF Invoice
+        </button>
         <a
           className="btn btn-ghost"
           href={`https://wa.me/?text=${whatsappText}`}

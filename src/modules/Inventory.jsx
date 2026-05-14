@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Package, Plus, Edit2, Trash2, AlertTriangle, Download, Clock, FileText } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Package, Plus, Edit2, Trash2, AlertTriangle, Download, Clock, FileText, Upload } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
@@ -22,6 +22,37 @@ export default function Inventory({ searchQuery }) {
   const [isAdjModalOpen, setIsAdjModalOpen] = useState(false);
   const [adjProd, setAdjProd] = useState(null);
   const [adjForm, setAdjForm] = useState({ qty: '', reason: 'Restock' });
+  const [importMsg, setImportMsg] = useState('');
+  const csvRef = useRef(null);
+
+  const downloadCSVTemplate = () => {
+    const csv = 'Name,SKU,Category,Selling Price,Cost Price,Stock,Min Stock,Unit,Expiry Date\nProduct 1,SKU-001,General,100,60,50,5,Pcs,\nProduct 2,SKU-002,Food & Beverage,50,30,100,10,Kg,2026-12-31';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'inventory-template.csv';
+    a.click();
+  };
+
+  const handleCSVImport = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const text = await file.text();
+    const lines = text.trim().split('\n').slice(1); // skip header
+    let count = 0;
+    lines.forEach(line => {
+      const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+      if (!cols[0]) return;
+      const [name, sku, category, price, costPrice, stock, minStock, unit, expiryDate] = cols;
+      if (name) {
+        saveProduct({ name, sku, category: category || 'General', price: Number(price) || 0, costPrice: Number(costPrice) || 0, stock: Number(stock) || 0, minStock: Number(minStock) || 5, unit: unit || 'Pcs', expiryDate: expiryDate || '' });
+        count++;
+      }
+    });
+    setImportMsg(`✓ ${count} products imported successfully!`);
+    setTimeout(() => setImportMsg(''), 3000);
+    e.target.value = '';
+  };
 
   const today = new Date();
   const in30days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -96,10 +127,20 @@ export default function Inventory({ searchQuery }) {
           </div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button className="btn btn-ghost" onClick={exportCSV} title="Export as CSV"><Download size={16} /> CSV</button>
+          <button className="btn btn-ghost" onClick={exportCSV} title="Export as CSV"><Download size={16} /> Export</button>
+          <button className="btn btn-ghost" onClick={downloadCSVTemplate} title="Download CSV Template"><FileText size={16} /> Template</button>
+          <label className="btn btn-ghost" style={{ cursor: 'pointer' }} title="Import CSV">
+            <Upload size={16} /> Import
+            <input ref={csvRef} type="file" accept=".csv" style={{ display: 'none' }} onChange={handleCSVImport} />
+          </label>
           <button className="btn btn-primary" onClick={openAdd}><Plus size={16} /> Add Product</button>
         </div>
       </div>
+      {importMsg && (
+        <div style={{ padding: '8px 16px', borderRadius: 8, background: 'rgba(16,185,129,0.1)', border: '1px solid var(--emerald-g)', color: 'var(--emerald)', fontSize: '0.82rem', marginBottom: 12, fontWeight: 600 }}>
+          {importMsg}
+        </div>
+      )}
 
       {/* Category Filter */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
