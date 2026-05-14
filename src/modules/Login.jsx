@@ -14,15 +14,6 @@ import {
 const provider = new GoogleAuthProvider();
 
 export default function Login({ onLogin }) {
-  useEffect(() => {
-    // Handle redirect result
-    getRedirectResult(auth).then((result) => {
-      if (result) onLogin(result.user.email);
-    }).catch((err) => {
-      if (err.code !== 'auth/popup-closed-by-user') setError(friendlyError(err.code));
-    });
-  }, [onLogin]);
-
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -87,16 +78,22 @@ export default function Login({ onLogin }) {
   const handleGoogle = async () => {
     setGoogleLoading(true); setError('');
     try {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        await signInWithRedirect(auth, provider);
-      } else {
-        const cred = await signInWithPopup(auth, provider);
+      const gProvider = new GoogleAuthProvider();
+      // Set custom parameters to force account selection if needed
+      gProvider.setCustomParameters({ prompt: 'select_account' });
+      
+      const cred = await signInWithPopup(auth, gProvider);
+      if (cred?.user) {
         onLogin(cred.user.email);
       }
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user') setError(friendlyError(err.code));
-    } finally { setGoogleLoading(false); }
+      console.error("Google Auth Error:", err.code, err.message);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(friendlyError(err.code));
+      }
+    } finally { 
+      setGoogleLoading(false); 
+    }
   };
 
   return (
