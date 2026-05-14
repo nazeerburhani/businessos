@@ -3,8 +3,9 @@ import { Search, Bell, Sun, Moon, Globe, X, AlertTriangle, BookOpen } from 'luci
 import { useBusiness } from '../context/BusinessContext';
 import { useTheme } from '../hooks/useTheme';
 import { useTranslation } from '../hooks/useTranslation';
+import CommandPalette from './CommandPalette';
 
-export default function TopBar({ searchQuery, setSearchQuery }) {
+export default function TopBar({ searchQuery, setSearchQuery, setActiveTab }) {
   const { stats, data } = useBusiness();
   const { theme, toggleTheme, isDark } = useTheme();
   const { t, lang, toggleLang, isUrdu } = useTranslation();
@@ -99,6 +100,9 @@ export default function TopBar({ searchQuery, setSearchQuery }) {
       </div>
 
       <div className="topbar-right">
+        {/* Command Palette */}
+        {setActiveTab && <CommandPalette onNavigate={setActiveTab} />}
+
         {/* Date */}
         <div className="topbar-date">
           {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}

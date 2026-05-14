@@ -24,6 +24,7 @@ import Coupons from './modules/Coupons';
 import Reorder from './modules/Reorder';
 import MarginAnalysis from './modules/MarginAnalysis';
 import CurrencyConverter from './modules/CurrencyConverter';
+import ShiftManager from './modules/ShiftManager';
 import Login from './modules/Login';
 
 export default function App() {
@@ -91,6 +92,7 @@ export default function App() {
       case 'reorder':    return <Reorder />;
       case 'margin':     return <MarginAnalysis />;
       case 'currency':   return <CurrencyConverter />;
+      case 'shift':      return <ShiftManager />;
       case 'useraccess': return <UserAccess />;
       case 'settings':   return <Settings />;
       default:           return <Dashboard setActiveTab={setActiveTab} />;
@@ -109,7 +111,7 @@ export default function App() {
       />
 
       <main className="main-content">
-        <TopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <TopBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} setActiveTab={setActiveTab} />
         <div className="module-body">
           {renderModule()}
         </div>
@@ -136,8 +138,8 @@ export default function App() {
       )}
 
       <div className="credit-footer">
-        Developed By Nazeer Ahmad · BusinessOS v2.0 &nbsp;·&nbsp;
-        <span style={{ opacity: 0.5, fontSize: '0.65rem' }}>F1=POS F2=Inventory F3=Khata F4=Reports F5=Home</span>
+        Developed By Nazeer Ahmad · BusinessOS v3.0 &nbsp;·&nbsp;
+        <span style={{ opacity: 0.5, fontSize: '0.65rem' }}>F1=POS F2=Inventory F3=Khata F4=Reports F5=Home · Ctrl+K=Search</span>
       </div>
     </div>
   );

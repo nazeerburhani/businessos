@@ -7,7 +7,7 @@ const emptyForm = {
   name: '', sku: '', category: 'General',
   price: '', costPrice: '', stock: '', minStock: 5,
   unit: 'Pcs', supplier: '', description: '',
-  expiryDate: '', batchNumber: '',
+  expiryDate: '', batchNumber: '', imageUrl: '',
 };
 
 export default function Inventory({ searchQuery }) {
@@ -171,8 +171,19 @@ export default function Inventory({ searchQuery }) {
                 return (
                   <tr key={p.id}>
                     <td>
-                      <div style={{ fontWeight: 600 }}>{p.name}</div>
-                      {p.batchNumber && <div style={{ fontSize: '0.68rem', color: 'var(--txt3)' }}>Batch: {p.batchNumber}</div>}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        {p.imageUrl ? (
+                          <img src={p.imageUrl} alt={p.name} style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6, flexShrink: 0 }} onError={e => e.target.style.display='none'} />
+                        ) : (
+                          <div style={{ width: 36, height: 36, borderRadius: 6, background: 'var(--bg-input)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Package size={16} color="var(--txt3)" />
+                          </div>
+                        )}
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{p.name}</div>
+                          {p.batchNumber && <div style={{ fontSize: '0.68rem', color: 'var(--txt3)' }}>Batch: {p.batchNumber}</div>}
+                        </div>
+                      </div>
                     </td>
                     <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{p.sku || '—'}</td>
                     <td><span className="badge badge-neutral">{p.category}</span></td>
@@ -262,6 +273,16 @@ export default function Inventory({ searchQuery }) {
               <div className="input-wrap" style={{ gridColumn: '1/-1' }}>
                 <label className="input-label">Description</label>
                 <textarea className="textarea-input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} placeholder="Optional notes" />
+              </div>
+              <div className="input-wrap" style={{ gridColumn: '1/-1' }}>
+                <label className="input-label">🖼️ Product Image URL</label>
+                <input className="input" value={form.imageUrl || ''} onChange={e => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://example.com/product.jpg" />
+                {form.imageUrl && (
+                  <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <img src={form.imageUrl} alt="preview" style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }} onError={e => e.target.style.display='none'} />
+                    <span style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>Image preview</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
