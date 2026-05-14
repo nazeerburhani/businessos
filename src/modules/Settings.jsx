@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Settings, Save, AlertTriangle, Trash2, Upload, X, Globe, Clock, Download, RefreshCw } from 'lucide-react';
+import { Settings, Save, AlertTriangle, Trash2, Upload, X, Globe, Clock, Download, RefreshCw, Shield } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
 export default function SettingsModule() {
-  const { data, saveSettings, resetData, backupData, restoreData } = useBusiness();
+  const { data, saveSettings, resetData, backupData, restoreData, restoreAutoBackup } = useBusiness();
   const restoreRef = useRef(null);
   const [restoreMsg, setRestoreMsg] = useState('');
   const [form, setForm] = useState({ ...data.settings });
@@ -186,6 +186,13 @@ export default function SettingsModule() {
                 e.target.value = '';
               }} />
             </label>
+            <button type="button" className="btn btn-ghost" onClick={() => {
+              const ok = restoreAutoBackup();
+              setRestoreMsg(ok ? '✓ Auto-backup restored!' : '✗ No auto-backup found.');
+              setTimeout(() => setRestoreMsg(''), 3000);
+            }} style={{ gridColumn: '1/-1', color: 'var(--amber)', borderColor: 'var(--amber-g)' }}>
+              <RefreshCw size={15} /> Restore Yesterday's Auto-Backup
+            </button>
           </div>
           {restoreMsg && <div style={{ fontSize: '0.8rem', color: restoreMsg.startsWith('✓') ? 'var(--emerald)' : 'var(--rose)', padding: '6px 10px', borderRadius: 6, background: 'rgba(0,0,0,0.2)' }}>{restoreMsg}</div>}
           <p style={{ fontSize: '0.72rem', color: 'var(--txt3)', marginTop: 8 }}>Backup saves all your products, customers, and transactions as a JSON file. Restore will replace ALL current data.</p>

@@ -17,6 +17,8 @@ import Settings from './modules/Settings';
 import Suppliers from './modules/Suppliers';
 import Purchases from './modules/Purchases';
 import Reports from './modules/Reports';
+import Loyalty from './modules/Loyalty';
+import UserAccess from './modules/UserAccess';
 import Login from './modules/Login';
 
 export default function App() {
@@ -78,6 +80,8 @@ export default function App() {
       case 'expenses':   return <Expenses />;
       case 'analytics':  return <Analytics />;
       case 'reports':    return <Reports />;
+      case 'loyalty':    return <Loyalty />;
+      case 'useraccess': return <UserAccess />;
       case 'settings':   return <Settings />;
       default:           return <Dashboard setActiveTab={setActiveTab} />;
     }

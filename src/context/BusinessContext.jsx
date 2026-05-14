@@ -12,7 +12,16 @@ const initialData = {
     logoUrl: '',
     businessHours: '', website: '',
     bankDetails: { name: '', account: '', branch: '' },
-    roundOff: 'none', // none, nearest1, nearest05
+    roundOff: 'none',
+    // Loyalty
+    loyaltyEnabled: false,
+    loyaltyPointsPerRs: 1,     // 1 point per Rs. spent
+    loyaltyRedeemValue: 1,     // 1 point = Rs. 1 discount
+    loyaltyMinRedeem: 100,     // minimum points to redeem
+    // User roles / PINs
+    users: [
+      { id: 1, name: 'Owner', pin: '0000', role: 'owner' },
+    ],
   },
   accounts: { cash: 0, bank: 0 },
   products: [],
@@ -46,6 +55,19 @@ export function BusinessProvider({ children }) {
   });
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }, [data]);
+
+  // ─── AUTO DAILY BACKUP ───────────────────────────────────────────────────────
+  useEffect(() => {
+    const BACKUP_KEY = 'businessos_last_backup';
+    const last = localStorage.getItem(BACKUP_KEY);
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (!last || now - Number(last) > oneDay) {
+      // Silently save a JSON string to a separate key (not download — avoid annoying users)
+      localStorage.setItem('businessos_auto_backup', JSON.stringify(data));
+      localStorage.setItem(BACKUP_KEY, String(now));
+    }
+  }, []);  // run once on mount
 
   // ─── STATS ───────────────────────────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -105,6 +127,10 @@ export function BusinessProvider({ children }) {
 
       const payments = txn.payments || [{ method: txn.paymentMethod, amount: txn.total, customerId: txn.customerId }];
 
+      // Loyalty points — award based on total spent
+      const loyaltyEnabled = prev.settings.loyaltyEnabled;
+      const pointsPerRs = prev.settings.loyaltyPointsPerRs || 1;
+
       payments.forEach(pay => {
         if (pay.method === 'cash')  newAccounts.cash += pay.amount;
         else if (pay.method === 'bank') newAccounts.bank += pay.amount;
@@ -121,6 +147,14 @@ export function BusinessProvider({ children }) {
             };
           }
         }
+        // Award loyalty points to identified khata customer
+        if (loyaltyEnabled && pay.customerId) {
+          const idx = newKhata.findIndex(k => k.id === Number(pay.customerId));
+          if (idx > -1) {
+            const earned = Math.floor(pay.amount * pointsPerRs);
+            newKhata[idx] = { ...newKhata[idx], loyaltyPoints: (newKhata[idx].loyaltyPoints || 0) + earned };
+          }
+        }
       });
 
       return {
@@ -134,6 +168,49 @@ export function BusinessProvider({ children }) {
         }),
       };
     });
+  };
+
+  // ─── LOYALTY POINTS ───────────────────────────────────────────────────────────
+  const redeemLoyaltyPoints = (customerId, points) => {
+    setData(prev => ({
+      ...prev,
+      khata: prev.khata.map(k => {
+        if (k.id !== customerId) return k;
+        const redeemed = Math.min(points, k.loyaltyPoints || 0);
+        return { ...k, loyaltyPoints: (k.loyaltyPoints || 0) - redeemed };
+      })
+    }));
+  };
+
+  // ─── PIN USERS ────────────────────────────────────────────────────────────────
+  const saveUser = (user) => setData(prev => ({
+    ...prev,
+    settings: {
+      ...prev.settings,
+      users: user.id
+        ? (prev.settings.users || []).map(u => u.id === user.id ? user : u)
+        : [...(prev.settings.users || []), { ...user, id: Date.now() }]
+    }
+  }));
+
+  const deleteUser = (id) => setData(prev => ({
+    ...prev,
+    settings: { ...prev.settings, users: (prev.settings.users || []).filter(u => u.id !== id) }
+  }));
+
+  const verifyPIN = (pin) => {
+    const users = data.settings.users || [];
+    return users.find(u => u.pin === String(pin)) || null;
+  };
+
+  const restoreAutoBackup = () => {
+    const raw = localStorage.getItem('businessos_auto_backup');
+    if (!raw) return false;
+    try {
+      const parsed = JSON.parse(raw);
+      setData(prev => ({ ...initialData, ...parsed, settings: { ...initialData.settings, ...(parsed.settings || {}) } }));
+      return true;
+    } catch { return false; }
   };
 
   // ─── HELD BILLS ──────────────────────────────────────────────────────────────
@@ -299,6 +376,7 @@ export function BusinessProvider({ children }) {
       data, stats,
       saveProduct, deleteProduct, adjustStock,
       addTransaction,
+      redeemLoyaltyPoints,
       holdBill, resumeBill, deleteHeldBill,
       addPurchase,
       saveKhataCustomer, deleteKhataCustomer, addKhataEntry,
@@ -306,7 +384,8 @@ export function BusinessProvider({ children }) {
       saveEmployee, deleteEmployee, markAttendance, processPayroll,
       saveExpense, deleteExpense,
       saveSettings, resetData,
-      backupData, restoreData,
+      backupData, restoreData, restoreAutoBackup,
+      saveUser, deleteUser, verifyPIN,
     }}>
       {children}
     </BusinessContext.Provider>
