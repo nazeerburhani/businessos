@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Zap, Mail, Lock, Eye, EyeOff, AlertCircle, User, ArrowRight } from 'lucide-react';
 import { auth } from '../firebase';
 import {
@@ -6,12 +6,23 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   updateProfile,
 } from 'firebase/auth';
 
 const provider = new GoogleAuthProvider();
 
 export default function Login({ onLogin }) {
+  useEffect(() => {
+    // Handle redirect result
+    getRedirectResult(auth).then((result) => {
+      if (result) onLogin(result.user.email);
+    }).catch((err) => {
+      if (err.code !== 'auth/popup-closed-by-user') setError(friendlyError(err.code));
+    });
+  }, [onLogin]);
+
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -72,8 +83,13 @@ export default function Login({ onLogin }) {
   const handleGoogle = async () => {
     setGoogleLoading(true); setError('');
     try {
-      const cred = await signInWithPopup(auth, provider);
-      onLogin(cred.user.email);
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+      } else {
+        const cred = await signInWithPopup(auth, provider);
+        onLogin(cred.user.email);
+      }
     } catch (err) {
       if (err.code !== 'auth/popup-closed-by-user') setError(friendlyError(err.code));
     } finally { setGoogleLoading(false); }
