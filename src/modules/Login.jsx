@@ -9,6 +9,9 @@ import {
   signInWithRedirect,
   getRedirectResult,
   updateProfile,
+  getAdditionalUserInfo,
+  deleteUser,
+  signOut,
 } from 'firebase/auth';
 
 const provider = new GoogleAuthProvider();
@@ -83,7 +86,17 @@ export default function Login({ onLogin }) {
       gProvider.setCustomParameters({ prompt: 'select_account' });
       
       const cred = await signInWithPopup(auth, gProvider);
+      
       if (cred?.user) {
+        const info = getAdditionalUserInfo(cred);
+        
+        // If user is in Login mode but the account is NEW, prevent login
+        if (mode === 'login' && info?.isNewUser) {
+          setError('No account found for this email. Please click "Sign Up" above to create your account first.');
+          await signOut(auth); // Sign them out immediately
+          return;
+        }
+
         onLogin(cred.user.email);
       }
     } catch (err) {
