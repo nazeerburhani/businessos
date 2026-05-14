@@ -16,6 +16,7 @@ import Analytics from './modules/Analytics';
 import Settings from './modules/Settings';
 import Suppliers from './modules/Suppliers';
 import Purchases from './modules/Purchases';
+import Reports from './modules/Reports';
 import Login from './modules/Login';
 
 export default function App() {
@@ -41,12 +42,13 @@ export default function App() {
       case 'dashboard':  return <Dashboard setActiveTab={setActiveTab} />;
       case 'pos':        return <POS searchQuery={searchQuery} />;
       case 'inventory':  return <Inventory searchQuery={searchQuery} />;
+      case 'purchases':  return <Purchases />;
       case 'khata':      return <Khata />;
       case 'suppliers':  return <Suppliers />;
-      case 'purchases':  return <Purchases />;
       case 'employees':  return <Staff />;
       case 'expenses':   return <Expenses />;
       case 'analytics':  return <Analytics />;
+      case 'reports':    return <Reports />;
       case 'settings':   return <Settings />;
       default:           return <Dashboard setActiveTab={setActiveTab} />;
     }

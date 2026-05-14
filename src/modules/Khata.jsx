@@ -20,6 +20,21 @@ export default function Khata() {
   const totalDebt = khata.reduce((a, k) => a + (k.balance > 0 ? k.balance : 0), 0);
   const totalCredit = khata.reduce((a, k) => a + (k.balance < 0 ? Math.abs(k.balance) : 0), 0);
 
+  const getDaysSinceLastPayment = (customer) => {
+    const payments = customer.history?.filter(h => h.type === 'payment') || [];
+    if (!payments.length) {
+      const debts = customer.history?.filter(h => h.type === 'debt') || [];
+      if (!debts.length || customer.balance <= 0) return null;
+      const oldest = debts[debts.length - 1];
+      const days = Math.floor((Date.now() - new Date(oldest.date)) / 86400000);
+      return days > 0 ? days : null;
+    }
+    const lastPayment = payments[0];
+    if (customer.balance <= 0) return null;
+    const days = Math.floor((Date.now() - new Date(lastPayment.date)) / 86400000);
+    return days > 7 ? days : null;
+  };
+
   const openCust = (c) => { setCustForm(c ? { ...c } : emptyCustomer); setCustModal(true); };
   const saveCust = (e) => { e.preventDefault(); saveKhataCustomer({ ...custForm, creditLimit: Number(custForm.creditLimit) || 0 }); setCustModal(false); };
 
@@ -75,7 +90,10 @@ export default function Khata() {
               <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
                 <div className="khata-avatar">{initials(c.name)}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: 700, fontSize: '1rem' }}>{c.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1rem' }}>{c.name}</div>
+                    {(() => { const days = getDaysSinceLastPayment(c); return days ? <span style={{ fontSize: '0.6rem', padding: '2px 6px', borderRadius: 4, background: days > 30 ? 'var(--rose-s)' : 'rgba(245,158,11,0.1)', color: days > 30 ? 'var(--rose)' : 'var(--amber)', fontWeight: 700 }}>{days}d overdue</span> : null; })()}
+                  </div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--txt3)' }}>{c.phone}</div>
                   {c.email && <div style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>{c.email}</div>}
                 </div>
@@ -116,7 +134,11 @@ export default function Khata() {
                   <button className="btn btn-ghost btn-sm btn-icon" onClick={() => setLedgerModal(c)}><Eye size={14} /></button>
                 )}
                 {c.phone && (
-                  <button className="btn btn-sm btn-icon" style={{ background: '#1a3d2b', border: '1px solid #25D36655', color: '#25D366' }} onClick={() => window.open(`https://wa.me/${c.phone.replace(/\D/g, '')}?text=Dear ${c.name}, your current balance is ${cur} ${Math.abs(c.balance).toLocaleString()}. Developed by Nazeer Ahmad.`)}>
+                  <button className="btn btn-sm btn-icon" style={{ background: '#1a3d2b', border: '1px solid #25D36655', color: '#25D366' }} onClick={() => {
+                    const days = getDaysSinceLastPayment(c);
+                    const msg = `Dear ${c.name},\n\nThis is a friendly reminder from *${data.settings.businessName}*.\n\nYour current outstanding balance is *${cur} ${Math.abs(c.balance).toLocaleString()}*.${days ? `\nIt has been ${days} days since your last payment.` : ''}\n\nPlease clear your dues at your earliest convenience.\n\nThank you! 🙏`;
+                    window.open(`https://wa.me/${c.phone.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`);
+                  }}>
                     <Phone size={13} />
                   </button>
                 )}

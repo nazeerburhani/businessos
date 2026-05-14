@@ -8,7 +8,7 @@ export default function Analytics() {
   const { transactions, expenses, products, settings } = data;
   const cur = settings.currency;
 
-  // Sales by day (last 14 days)
+  // Sales by day (last 14 transactions)
   const salesChart = transactions.slice(0, 14).reverse().map(t => ({ date: t.date?.slice(5) || '', total: t.total }));
 
   // Expense by category
@@ -16,8 +16,25 @@ export default function Analytics() {
   expenses.forEach(e => { expCats[e.category] = (expCats[e.category] || 0) + e.amount; });
   const expChart = Object.entries(expCats).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([name, value]) => ({ name, value }));
 
-  // Top products by stock sold (price * original_stock - current)
-  const topProducts = [...products].sort((a, b) => b.price - a.price).slice(0, 5);
+  // Top products by ACTUAL UNITS SOLD from transactions
+  const productSalesMap = {};
+  transactions.forEach(t => {
+    t.items?.forEach(item => {
+      if (!productSalesMap[item.id]) productSalesMap[item.id] = { name: item.name, qty: 0, revenue: 0 };
+      productSalesMap[item.id].qty += item.qty || 0;
+      productSalesMap[item.id].revenue += (item.price * item.qty) || 0;
+    });
+  });
+  const topProducts = Object.values(productSalesMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  const hasTopProducts = topProducts.length > 0;
+
+  // Payment method breakdown
+  const payMap = {};
+  transactions.forEach(t => {
+    const pays = t.payments || [{ method: t.paymentMethod || 'cash', amount: t.total }];
+    pays.forEach(p => { payMap[p.method] = (payMap[p.method] || 0) + (p.amount || 0); });
+  });
+  const payChart = Object.entries(payMap).map(([name, value]) => ({ name, value }));
 
   // Monthly breakdown
   const monthMap = {};
@@ -115,23 +132,23 @@ export default function Analytics() {
           ) : <div className="empty-state" style={{ padding: 40 }}><TrendingDown size={32} /><p>No expense data</p></div>}
         </div>
 
-        {/* Top Products */}
+        {/* Top Products by Units Sold */}
         <div className="glass" style={{ padding: 24 }}>
           <h3 style={{ marginBottom: 16, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <Package size={16} color="var(--emerald)" /> Top Products by Value
+            <Package size={16} color="var(--emerald)" /> Top Products by Revenue
           </h3>
-          {topProducts.length === 0 ? (
-            <div className="empty-state" style={{ padding: 40 }}><Package size={32} /><p>No products</p></div>
+          {!hasTopProducts ? (
+            <div className="empty-state" style={{ padding: 40 }}><Package size={32} /><p>Make some sales to see top products</p></div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {topProducts.map((p, i) => (
-                <div key={p.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <span style={{ width: 22, height: 22, borderRadius: '50%', background: COLORS[i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#000', flexShrink: 0 }}>{i + 1}</span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
-                    <div style={{ fontSize: '0.7rem', color: 'var(--txt3)' }}>{p.category} · Stock: {p.stock}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--txt3)' }}>{p.qty} units sold</div>
                   </div>
-                  <div style={{ fontWeight: 700, color: 'var(--cyan)', fontSize: '0.9rem', flexShrink: 0 }}>{cur} {p.price?.toLocaleString()}</div>
+                  <div style={{ fontWeight: 700, color: 'var(--cyan)', fontSize: '0.9rem', flexShrink: 0 }}>{cur} {p.revenue.toLocaleString()}</div>
                 </div>
               ))}
             </div>

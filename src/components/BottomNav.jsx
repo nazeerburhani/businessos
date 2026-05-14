@@ -1,4 +1,4 @@
-import { LayoutDashboard, ShoppingCart, Package, BookOpen, Truck, ShoppingBag, Users, CreditCard, BarChart2, Settings } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, BookOpen, Truck, ShoppingBag, Users, CreditCard, BarChart2, FileText, Settings } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
   const tabs = [
@@ -11,6 +11,7 @@ export default function BottomNav({ activeTab, setActiveTab }) {
     { id: 'employees',  label: 'Staff',   icon: Users           },
     { id: 'expenses',   label: 'Exp.',    icon: CreditCard      },
     { id: 'analytics',  label: 'Stats',   icon: BarChart2       },
+    { id: 'reports',    label: 'Reports', icon: FileText        },
     { id: 'settings',   label: 'Set.',    icon: Settings        },
   ];
 

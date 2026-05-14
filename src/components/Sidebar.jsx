@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp, Truck, ShoppingBag } from 'lucide-react';
+import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp, Truck, ShoppingBag, FileText } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
@@ -20,6 +20,7 @@ const navGroups = [
       { id: 'khata', label: 'Khata Ledger', icon: BookOpen, color: 'a', badgeKey: 'khata' },
       { id: 'expenses', label: 'Expenses', icon: CreditCard, color: 'r' },
       { id: 'analytics', label: 'Analytics', icon: BarChart2, color: 'v' },
+      { id: 'reports', label: 'Reports', icon: FileText, color: 'c' },
     ]
   },
   {

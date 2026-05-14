@@ -4,7 +4,7 @@ import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
 const CATEGORIES = ['Rent', 'Utilities', 'Payroll', 'Stock Purchase', 'Marketing', 'Maintenance', 'Transport', 'Office', 'Other'];
-const emptyForm = { desc: '', amount: '', category: 'Other', date: new Date().toISOString().split('T')[0], paymentMethod: 'Cash', notes: '' };
+const emptyForm = { desc: '', amount: '', category: 'Other', date: new Date().toISOString().split('T')[0], paymentMethod: 'Cash', notes: '', recurring: false };
 
 export default function Expenses() {
   const { data, saveExpense, deleteExpense } = useBusiness();
@@ -85,14 +85,22 @@ export default function Expenses() {
                 <tr key={e.id}>
                   <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{e.date}</td>
                   <td>
-                    <div style={{ fontWeight: 500 }}>{e.desc}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <span style={{ fontWeight: 500 }}>{e.desc}</span>
+                      {e.recurring && <span style={{ fontSize: '0.6rem', padding: '1px 5px', borderRadius: 4, background: 'var(--cyan-s)', color: 'var(--cyan)', fontWeight: 700 }}>🔄 Monthly</span>}
+                    </div>
                     {e.notes && <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>{e.notes}</div>}
                   </td>
                   <td><span className="badge badge-warning">{e.category}</span></td>
                   <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{e.paymentMethod || 'Cash'}</td>
                   <td style={{ fontWeight: 700, color: 'var(--rose)' }}>-{cur} {e.amount?.toLocaleString()}</td>
                   <td>
-                    <button className="btn btn-sm btn-icon" style={{ background: 'var(--rose-s)', border: '1px solid var(--rose-g)', color: 'var(--rose)' }} onClick={() => deleteExpense(e.id)}><Trash2 size={13} /></button>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {e.recurring && (
+                        <button className="btn btn-ghost btn-sm btn-icon" title="Repeat this expense" style={{ color: 'var(--cyan)' }} onClick={() => { setForm({ ...e, id: undefined, date: new Date().toISOString().split('T')[0] }); setModal(true); }}>↻</button>
+                      )}
+                      <button className="btn btn-sm btn-icon" style={{ background: 'var(--rose-s)', border: '1px solid var(--rose-g)', color: 'var(--rose)' }} onClick={() => deleteExpense(e.id)}><Trash2 size={13} /></button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -133,6 +141,10 @@ export default function Expenses() {
             <div className="input-wrap">
               <label className="input-label">Notes (Optional)</label>
               <textarea className="textarea-input" rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 0' }}>
+              <input type="checkbox" id="recurring-chk" checked={form.recurring || false} onChange={e => setForm({ ...form, recurring: e.target.checked })} style={{ width: 16, height: 16, cursor: 'pointer' }} />
+              <label htmlFor="recurring-chk" style={{ cursor: 'pointer', fontSize: '0.85rem' }}>🔄 Mark as Monthly Recurring (e.g. Rent, Utilities)</label>
             </div>
           </div>
           <div className="modal-foot">
