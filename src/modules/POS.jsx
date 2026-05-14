@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen, Camera, FileDown } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen, Camera, FileDown, Zap } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 import BarcodeScanner from '../components/BarcodeScanner';
@@ -88,9 +88,11 @@ function Receipt({ txn, settings, onClose }) {
 
 // ─── PAYMENT ROW ─────────────────────────────────────────────────────────────
 const PAYMENT_METHODS = [
-  { id: 'cash',  label: 'Cash',  icon: Banknote,   color: 'var(--emerald)' },
-  { id: 'bank',  label: 'Bank',  icon: CreditCard, color: 'var(--cyan)'    },
-  { id: 'khata', label: 'Khata', icon: BookOpen,   color: 'var(--amber)'   },
+  { id: 'cash',      label: 'Cash',      icon: Banknote,   color: 'var(--emerald)' },
+  { id: 'bank',      label: 'Bank',      icon: CreditCard, color: 'var(--cyan)'    },
+  { id: 'easypaisa', label: 'EasyPaisa', icon: Zap,        color: '#34A853'        },
+  { id: 'jazzcash',  label: 'JazzCash',  icon: Zap,        color: '#E61C23'        },
+  { id: 'khata',     label: 'Khata',     icon: BookOpen,   color: 'var(--amber)'   },
 ];
 
 // ─── MAIN POS ─────────────────────────────────────────────────────────────────
@@ -336,22 +338,46 @@ export default function POS({ searchQuery }) {
               </div>
               {payments.map((pay, idx) => (
                 <div key={idx} style={{ display: 'flex', gap: 5, marginBottom: 5, alignItems: 'center' }}>
-                  <select
-                    className="select-input"
-                    style={{ flex: 1, height: 32, fontSize: '0.8rem' }}
-                    value={pay.method}
-                    onChange={e => updatePaymentAmount(idx, 'method', e.target.value)}
-                  >
-                    {PAYMENT_METHODS.map(m => <option key={m.id} value={m.id}>{m.label}</option>)}
-                  </select>
+                  <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {PAYMENT_METHODS.map(m => {
+                      const MIcon = m.icon;
+                      const isSel = pay.method === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => updatePaymentAmount(idx, 'method', m.id)}
+                          style={{
+                            flex: '1 0 45%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 6,
+                            padding: '6px 8px',
+                            borderRadius: 8,
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            border: `1px solid ${isSel ? 'var(--accent)' : 'var(--border)'}`,
+                            background: isSel ? 'var(--accent-s)' : 'var(--bg-input)',
+                            color: isSel ? 'var(--accent)' : 'var(--txt2)',
+                            transition: 'var(--t)',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <MIcon size={12} style={{ color: isSel ? 'var(--accent)' : m.color }} />
+                          {m.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   {pay.method === 'khata' && (
                     <select
                       className="select-input"
-                      style={{ flex: 1.5, height: 32, fontSize: '0.75rem' }}
+                      style={{ width: '100%', marginTop: 4, height: 32, fontSize: '0.75rem' }}
                       value={pay.customerId}
                       onChange={e => updatePaymentAmount(idx, 'customerId', e.target.value)}
                     >
-                      <option value="">-- Customer --</option>
+                      <option value="">-- Select Customer --</option>
                       {khata.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   )}
