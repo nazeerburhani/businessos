@@ -19,6 +19,8 @@ import Purchases from './modules/Purchases';
 import Reports from './modules/Reports';
 import Loyalty from './modules/Loyalty';
 import UserAccess from './modules/UserAccess';
+import EODReport from './modules/EODReport';
+import Coupons from './modules/Coupons';
 import Login from './modules/Login';
 
 export default function App() {
@@ -81,6 +83,8 @@ export default function App() {
       case 'analytics':  return <Analytics />;
       case 'reports':    return <Reports />;
       case 'loyalty':    return <Loyalty />;
+      case 'coupons':    return <Coupons />;
+      case 'eod':        return <EODReport />;
       case 'useraccess': return <UserAccess />;
       case 'settings':   return <Settings />;
       default:           return <Dashboard setActiveTab={setActiveTab} />;

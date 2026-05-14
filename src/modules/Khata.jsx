@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Plus, Trash2, Phone, TrendingUp, TrendingDown, Eye, User, ShoppingBag, Star, MessageCircle } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Phone, TrendingUp, TrendingDown, Eye, User, ShoppingBag, Star, MessageCircle, Send } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
@@ -14,8 +14,10 @@ export default function Khata() {
   const [custForm, setCustForm] = useState(emptyCustomer);
   const [txnModal, setTxnModal] = useState(null);
   const [ledgerModal, setLedgerModal] = useState(null);
-  const [ledgerTab, setLedgerTab] = useState('ledger'); // 'ledger' | 'purchases'
+  const [ledgerTab, setLedgerTab] = useState('ledger');
   const [txnForm, setTxnForm] = useState({ amount: '', desc: '', date: new Date().toISOString().split('T')[0] });
+  const [bulkWAOpen, setBulkWAOpen] = useState(false);
+  const [bulkMsg, setBulkMsg] = useState('Dear {name}, your outstanding balance at {business} is {currency} {balance}. Kindly clear it at your earliest. Thank you!');
 
   const filtered = khata.filter(k => k.name?.toLowerCase().includes(search.toLowerCase()) || k.phone?.includes(search));
   const totalDebt = khata.reduce((a, k) => a + (k.balance > 0 ? k.balance : 0), 0);
@@ -55,7 +57,12 @@ export default function Khata() {
           <h1 className="page-title">Khata Ledger</h1>
           <div className="page-subtitle">{khata.length} customers · {cur} {totalDebt.toLocaleString()} outstanding</div>
         </div>
-        <button className="btn btn-primary" onClick={() => openCust(null)}><Plus size={16} /> Add Customer</button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-ghost" style={{ color: '#25D366', border: '1px solid #25D36655', background: 'rgba(37,211,102,0.08)' }} onClick={() => setBulkWAOpen(true)}>
+            <Send size={14} /> Bulk Reminder
+          </button>
+          <button className="btn btn-primary" onClick={() => openCust(null)}><Plus size={16} /> Add Customer</button>
+        </div>
       </div>
 
       {/* Summary Bar */}
@@ -320,6 +327,68 @@ export default function Khata() {
             </a>
           )}
           <button className="btn btn-ghost" onClick={() => setLedgerModal(null)}>Close</button>
+        </div>
+      </Modal>
+
+      {/* ── Bulk WhatsApp Reminder Modal ── */}
+      <Modal isOpen={bulkWAOpen} onClose={() => setBulkWAOpen(false)} title="📲 Bulk WhatsApp Reminders" wide>
+        <div className="modal-body">
+          <div className="input-wrap" style={{ marginBottom: 16 }}>
+            <label className="input-label">Message Template</label>
+            <textarea className="textarea-input" rows={3} value={bulkMsg} onChange={e => setBulkMsg(e.target.value)} />
+            <div style={{ fontSize: '0.68rem', color: 'var(--txt3)', marginTop: 4 }}>
+              Placeholders: <code style={{ color: 'var(--cyan)' }}>{'{name}'}</code> · <code style={{ color: 'var(--cyan)' }}>{'{balance}'}</code> · <code style={{ color: 'var(--cyan)' }}>{'{business}'}</code> · <code style={{ color: 'var(--cyan)' }}>{'{currency}'}</code>
+            </div>
+          </div>
+          <div style={{ marginBottom: 12, fontWeight: 700, fontSize: '0.85rem', color: 'var(--txt2)' }}>
+            {khata.filter(k => k.balance > 0 && k.phone).length} customers with outstanding balance &amp; phone number:
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 380, overflowY: 'auto' }}>
+            {khata.filter(k => k.balance > 0).length === 0 ? (
+              <div style={{ textAlign: 'center', padding: 30, color: 'var(--txt3)' }}>✅ No outstanding balances!</div>
+            ) : khata.filter(k => k.balance > 0).sort((a, b) => b.balance - a.balance).map(k => {
+              const msg = bulkMsg
+                .replace(/{name}/g, k.name)
+                .replace(/{balance}/g, k.balance.toLocaleString())
+                .replace(/{business}/g, data.settings.businessName)
+                .replace(/{currency}/g, cur);
+              const waLink = k.phone ? `https://wa.me/${k.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}` : null;
+              return (
+                <div key={k.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 14px', borderRadius: 10, background: 'var(--bg-input)', border: '1px solid var(--border)' }}>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--rose-s)', color: 'var(--rose)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.85rem', flexShrink: 0 }}>
+                    {initials(k.name)}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>{k.name}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>{k.phone || <span style={{ color: 'var(--rose)', fontStyle: 'italic' }}>No phone — add in customer profile</span>}</div>
+                  </div>
+                  <div style={{ fontWeight: 800, color: 'var(--rose)', minWidth: 80, textAlign: 'right' }}>{cur} {k.balance.toLocaleString()}</div>
+                  {waLink ? (
+                    <a href={waLink} target="_blank" rel="noreferrer"
+                      className="btn btn-sm"
+                      style={{ color: '#25D366', border: '1px solid #25D36655', background: 'rgba(37,211,102,0.1)', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      <MessageCircle size={12} /> Send
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: '0.68rem', color: 'var(--txt3)', minWidth: 56 }}>No phone</span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn btn-ghost" onClick={() => setBulkWAOpen(false)}>Close</button>
+          <button className="btn btn-success" onClick={() => {
+            const eligible = khata.filter(k => k.balance > 0 && k.phone);
+            if (!eligible.length) { alert('No customers with phone numbers and outstanding balance.'); return; }
+            eligible.forEach((k, i) => {
+              const msg = bulkMsg.replace(/{name}/g, k.name).replace(/{balance}/g, k.balance.toLocaleString()).replace(/{business}/g, data.settings.businessName).replace(/{currency}/g, cur);
+              setTimeout(() => window.open(`https://wa.me/${k.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank'), i * 600);
+            });
+          }}>
+            <Send size={14} /> Send All ({khata.filter(k => k.balance > 0 && k.phone).length})
+          </button>
         </div>
       </Modal>
     </div>
