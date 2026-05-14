@@ -32,7 +32,7 @@ export default function Login({ onLogin }) {
       case 'auth/invalid-credential':
       case 'auth/wrong-password':
       case 'auth/user-not-found':
-        return 'Invalid email or password.';
+        return 'No account found for this email.';
       case 'auth/email-already-in-use':
         return 'This email is already registered. Please sign in.';
       case 'auth/weak-password':
@@ -177,8 +177,12 @@ export default function Login({ onLogin }) {
               <label className="input-label">Confirm Password *</label>
               <div style={{ position: 'relative' }}>
                 <Lock size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--txt3)' }} />
-                <input className="input" style={{ paddingLeft: 36 }} type="password" placeholder="Re-enter password"
-                  value={confirmPw} onChange={e => setConfirmPw(e.target.value)} />
+                <input className="input" style={{ paddingLeft: 36, paddingRight: 44 }} type={showPw ? 'text' : 'password'}
+                  placeholder="Re-enter password" value={confirmPw} onChange={e => setConfirmPw(e.target.value)} />
+                <button type="button" onClick={() => setShowPw(!showPw)}
+                  style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--txt3)', cursor: 'pointer', display: 'flex', padding: 4 }}>
+                  {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
               </div>
             </div>
           )}
