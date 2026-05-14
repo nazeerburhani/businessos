@@ -12,7 +12,13 @@ export default function TopBar({ searchQuery, setSearchQuery }) {
   const [notifGranted, setNotifGranted] = useState(false);
   const notifRef = useRef(null);
 
-  const alertCount = (stats?.lowStockCount || 0) + (stats?.outOfStockCount || 0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const expiringCount = data.products.filter(p => {
+    if (!p.expiryDate) return false;
+    const d = new Date(p.expiryDate); d.setHours(0,0,0,0);
+    return Math.round((d - today) / 86400000) <= 14;
+  }).length;
+  const alertCount = (stats?.lowStockCount || 0) + (stats?.outOfStockCount || 0) + expiringCount;
   const overdueKhata = data?.khata?.filter(k => k.balance > 0) || [];
 
   // ── Close notif panel on outside click ──────────────────────────────────
@@ -67,6 +73,14 @@ export default function TopBar({ searchQuery, setSearchQuery }) {
     ...data.products.filter(p => p.stock > 0 && p.stock <= (p.minStock || 5)).map(p => ({
       type: 'warning', icon: '🟡', msg: `${p.name} — only ${p.stock} left (min: ${p.minStock || 5})`,
     })),
+    ...(() => {
+      const today = new Date(); today.setHours(0,0,0,0);
+      return data.products
+        .filter(p => p.expiryDate)
+        .map(p => { const d = new Date(p.expiryDate); d.setHours(0,0,0,0); return { ...p, daysLeft: Math.round((d-today)/(86400000)) }; })
+        .filter(p => p.daysLeft <= 14)
+        .map(p => ({ type: 'expiry', icon: '📅', msg: p.daysLeft < 0 ? `${p.name} EXPIRED ${Math.abs(p.daysLeft)}d ago!` : `${p.name} expires in ${p.daysLeft}d` }));
+    })(),
     ...overdueKhata.slice(0, 3).map(k => ({
       type: 'khata', icon: '📒', msg: `${k.name} owes ${data.settings.currency} ${k.balance?.toLocaleString()}`,
     })),

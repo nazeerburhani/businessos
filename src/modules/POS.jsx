@@ -24,34 +24,45 @@ function Receipt({ txn, settings, onClose }) {
 
   return (
     <div className="modal-body">
-      <div className="receipt">
+      <div className="receipt receipt-print">
         {settings.logoUrl && (
-          <img src={settings.logoUrl} alt="logo" style={{ width: 72, height: 72, objectFit: 'contain', display: 'block', margin: '0 auto 10px' }} />
+          <img src={settings.logoUrl} alt="logo" className="receipt-logo" style={{ width: 64, height: 64, objectFit: 'contain', display: 'block', margin: '0 auto 8px' }} />
         )}
-        <div className="receipt-meta">
-          <h2>{settings.businessName}</h2>
+        <div className="receipt-business-name receipt-center" style={{ textAlign: 'center', marginBottom: 4 }}>
+          <strong>{settings.businessName}</strong>
+        </div>
+        <div className="receipt-center" style={{ textAlign: 'center', fontSize: '0.72rem', color: '#555' }}>
           {settings.address && <div>{settings.address}</div>}
-          {settings.phone && <div>{settings.phone}</div>}
+          {settings.phone && <div>📞 {settings.phone}</div>}
           {settings.website && <div>{settings.website}</div>}
-          <div style={{ marginTop: 6, fontSize: '0.7rem' }}>{new Date().toLocaleString()}</div>
+        </div>
+        <div className="receipt-divider" style={{ borderTop: '1px dashed #ccc', margin: '8px 0' }} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#777', marginBottom: 6 }}>
+          <span>#{String(txn.id || Date.now()).slice(-6)}</span>
+          <span>{new Date().toLocaleString()}</span>
         </div>
         {txn.items.map((item, i) => (
-          <div key={i} className="receipt-row">
-            <span>{item.name} × {item.qty}</span>
+          <div key={i} className="receipt-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
+            <span className="receipt-item-name">{item.name} &times; {item.qty}</span>
             <span>{settings.currency} {(item.price * item.qty).toLocaleString()}</span>
           </div>
         ))}
-        {txn.discount > 0 && <div className="receipt-row"><span>Discount</span><span>- {settings.currency} {txn.discount}</span></div>}
-        {txn.tax > 0 && <div className="receipt-row"><span>Tax ({txn.taxRate}%)</span><span>{settings.currency} {txn.tax}</span></div>}
-        <div className="receipt-total-row">
+        <div className="receipt-divider" style={{ borderTop: '1px dashed #ccc', margin: '8px 0' }} />
+        {txn.discount > 0 && <div className="receipt-row" style={{ display: 'flex', justifyContent: 'space-between', color: 'green', marginBottom: 2 }}><span>Discount</span><span>- {settings.currency} {txn.discount}</span></div>}
+        {txn.tax > 0 && <div className="receipt-row" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}><span>Tax ({txn.taxRate}%)</span><span>{settings.currency} {txn.tax}</span></div>}
+        <div className="receipt-total-row" style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 800, fontSize: '1.05rem', borderTop: '2px solid #333', paddingTop: 6, marginTop: 4 }}>
           <span>TOTAL</span>
           <span>{settings.currency} {txn.total?.toLocaleString()}</span>
         </div>
-        <div className="receipt-row" style={{ marginTop: 8 }}>
+        <div className="receipt-row" style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '0.78rem' }}>
           <span>Payment</span>
-          <span style={{ textTransform: 'capitalize', fontSize: '0.75rem' }}>{payLabel}</span>
+          <span style={{ textTransform: 'capitalize' }}>{payLabel}</span>
         </div>
-        <div className="receipt-footer">{settings.receiptFooter}<br /><strong>Developed by Nazeer Ahmad</strong></div>
+        <div className="receipt-footer" style={{ textAlign: 'center', marginTop: 10, fontSize: '0.7rem', color: '#777', borderTop: '1px dashed #ccc', paddingTop: 8 }}>
+          {settings.receiptFooter}<br />
+          {settings.businessHours && <span>{settings.businessHours}<br /></span>}
+          <strong>Developed by Nazeer Ahmad</strong>
+        </div>
       </div>
       <div className="modal-foot">
         <button className="btn btn-ghost" onClick={onClose}>Close</button>

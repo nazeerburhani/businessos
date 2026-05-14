@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Plus, Trash2, Phone, TrendingUp, TrendingDown, Eye, User } from 'lucide-react';
+import { BookOpen, Plus, Trash2, Phone, TrendingUp, TrendingDown, Eye, User, ShoppingBag, Star, MessageCircle } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
@@ -12,8 +12,9 @@ export default function Khata() {
   const [search, setSearch] = useState('');
   const [custModal, setCustModal] = useState(false);
   const [custForm, setCustForm] = useState(emptyCustomer);
-  const [txnModal, setTxnModal] = useState(null); // { customer, type }
+  const [txnModal, setTxnModal] = useState(null);
   const [ledgerModal, setLedgerModal] = useState(null);
+  const [ledgerTab, setLedgerTab] = useState('ledger'); // 'ledger' | 'purchases'
   const [txnForm, setTxnForm] = useState({ amount: '', desc: '', date: new Date().toISOString().split('T')[0] });
 
   const filtered = khata.filter(k => k.name?.toLowerCase().includes(search.toLowerCase()) || k.phone?.includes(search));
@@ -215,28 +216,109 @@ export default function Khata() {
         </form>
       </Modal>
 
-      {/* Full Ledger Modal */}
-      <Modal isOpen={!!ledgerModal} onClose={() => setLedgerModal(null)} title={`Full Ledger — ${ledgerModal?.name}`} wide>
+      {/* Full Ledger Modal — Tabbed: History + Purchase History */}
+      <Modal isOpen={!!ledgerModal} onClose={() => setLedgerModal(null)} title={`Customer Profile — ${ledgerModal?.name}`} wide>
         <div className="modal-body">
-          <div className="tbl-wrap">
-            <table className="tbl">
-              <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead>
-              <tbody>
-                {ledgerModal?.history?.map(h => (
-                  <tr key={h.id}>
-                    <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{h.date}</td>
-                    <td>{h.desc}</td>
-                    <td><span className={`badge ${h.type === 'debt' ? 'badge-danger' : 'badge-success'}`}>{h.type === 'debt' ? 'Credit Given' : 'Payment'}</span></td>
-                    <td style={{ fontWeight: 700, color: h.type === 'debt' ? 'var(--rose)' : 'var(--emerald)' }}>
-                      {h.type === 'debt' ? '+' : '-'}{cur} {h.amount?.toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Customer profile header */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', padding: '12px 16px', background: 'var(--bg-input)', borderRadius: 10, marginBottom: 16 }}>
+            <div className="khata-avatar" style={{ width: 48, height: 48, fontSize: '1.2rem', flexShrink: 0 }}>{initials(ledgerModal?.name)}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 800, fontSize: '1.05rem' }}>{ledgerModal?.name}</div>
+              {ledgerModal?.phone && <div style={{ fontSize: '0.78rem', color: 'var(--txt3)' }}>📞 {ledgerModal.phone}</div>}
+              {ledgerModal?.address && <div style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>📍 {ledgerModal.address}</div>}
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.7rem', color: 'var(--txt3)' }}>Balance</div>
+              <div style={{ fontWeight: 900, fontSize: '1.4rem', color: (ledgerModal?.balance || 0) > 0 ? 'var(--rose)' : 'var(--emerald)' }}>
+                {cur} {Math.abs(ledgerModal?.balance || 0).toLocaleString()}
+              </div>
+              {(ledgerModal?.loyaltyPoints || 0) > 0 && (
+                <div style={{ fontSize: '0.72rem', color: 'var(--amber)', fontWeight: 600 }}>⭐ {ledgerModal.loyaltyPoints} pts</div>
+              )}
+            </div>
           </div>
+
+          {/* Tabs */}
+          <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+            {[['ledger', '📒 Ledger History'], ['purchases', '🛍️ Purchases']].map(([k, label]) => (
+              <button key={k} onClick={() => setLedgerTab(k)}
+                className={`btn btn-sm ${ledgerTab === k ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ fontSize: '0.78rem' }}>{label}</button>
+            ))}
+          </div>
+
+          {/* Ledger History Tab */}
+          {ledgerTab === 'ledger' && (
+            <div className="tbl-wrap">
+              <table className="tbl">
+                <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th></tr></thead>
+                <tbody>
+                  {!ledgerModal?.history?.length ? (
+                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: 30, color: 'var(--txt3)' }}>No transactions yet</td></tr>
+                  ) : ledgerModal.history.map(h => (
+                    <tr key={h.id}>
+                      <td style={{ color: 'var(--txt3)', fontSize: '0.8rem' }}>{h.date}</td>
+                      <td>{h.desc || (h.type === 'debt' ? 'Credit Given' : 'Payment Received')}</td>
+                      <td><span className={`badge ${h.type === 'debt' ? 'badge-danger' : 'badge-success'}`}>{h.type === 'debt' ? 'Credit' : 'Payment'}</span></td>
+                      <td style={{ fontWeight: 700, color: h.type === 'debt' ? 'var(--rose)' : 'var(--emerald)' }}>
+                        {h.type === 'debt' ? '+' : '-'}{cur} {h.amount?.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Purchase History Tab — cross-ref from transactions */}
+          {ledgerTab === 'purchases' && (() => {
+            const custId = ledgerModal?.id;
+            const purchaseTxns = data.transactions.filter(t =>
+              t.payments?.some(p => Number(p.customerId) === custId) ||
+              Number(t.customerId) === custId
+            );
+            const totalSpent = purchaseTxns.reduce((a, t) => a + (t.total || 0), 0);
+            return (
+              <div>
+                <div style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+                  <div style={{ flex: 1, padding: '10px 14px', borderRadius: 8, background: 'var(--bg-input)' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--txt3)' }}>TOTAL PURCHASES</div>
+                    <div style={{ fontWeight: 800, color: 'var(--cyan)' }}>{purchaseTxns.length} sales</div>
+                  </div>
+                  <div style={{ flex: 1, padding: '10px 14px', borderRadius: 8, background: 'var(--bg-input)' }}>
+                    <div style={{ fontSize: '0.68rem', color: 'var(--txt3)' }}>TOTAL SPENT</div>
+                    <div style={{ fontWeight: 800, color: 'var(--emerald)' }}>{cur} {totalSpent.toLocaleString()}</div>
+                  </div>
+                </div>
+                <div className="tbl-wrap">
+                  <table className="tbl">
+                    <thead><tr><th>Date</th><th>Items</th><th>Payment</th><th>Total</th></tr></thead>
+                    <tbody>
+                      {purchaseTxns.length === 0 ? (
+                        <tr><td colSpan={4} style={{ textAlign: 'center', padding: 30, color: 'var(--txt3)' }}>No purchases found. Sales via Khata payment link this customer.</td></tr>
+                      ) : purchaseTxns.map(t => (
+                        <tr key={t.id}>
+                          <td style={{ color: 'var(--txt3)', fontSize: '0.78rem' }}>{t.date}</td>
+                          <td style={{ fontSize: '0.75rem', maxWidth: 180 }}>{t.items?.map(i => `${i.name} ×${i.qty}`).join(', ') || '—'}</td>
+                          <td>{t.payments?.map(p => p.method).join('+') || t.paymentMethod || '—'}</td>
+                          <td style={{ fontWeight: 700, color: 'var(--cyan)' }}>{cur} {(t.total || 0).toLocaleString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            );
+          })()}
         </div>
         <div className="modal-foot">
+          {ledgerModal?.phone && (
+            <a href={`https://wa.me/${ledgerModal.phone.replace(/[^0-9]/g, '')}?text=Dear ${ledgerModal.name}, your balance is ${cur} ${Math.abs(ledgerModal.balance || 0).toLocaleString()}. Please clear soon.`}
+              target="_blank" rel="noreferrer"
+              className="btn btn-ghost" style={{ color: '#25D366', border: '1px solid #25D36655', background: 'rgba(37,211,102,0.08)' }}>
+              <MessageCircle size={14} /> WhatsApp
+            </a>
+          )}
           <button className="btn btn-ghost" onClick={() => setLedgerModal(null)}>Close</button>
         </div>
       </Modal>

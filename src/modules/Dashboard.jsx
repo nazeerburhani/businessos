@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star, Download } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star, Download, Clock, AlertCircle } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -267,6 +267,57 @@ export default function Dashboard({ setActiveTab }) {
           </div>
         )}
       </div>
+
+      {/* ── Stock Expiry Alerts ── */}
+      {(() => {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const expiring = data.products
+          .filter(p => p.expiryDate)
+          .map(p => {
+            const exp = new Date(p.expiryDate);
+            exp.setHours(0,0,0,0);
+            const diff = Math.round((exp - today) / (1000 * 60 * 60 * 24));
+            return { ...p, daysLeft: diff };
+          })
+          .filter(p => p.daysLeft <= 30)
+          .sort((a, b) => a.daysLeft - b.daysLeft);
+
+        if (expiring.length === 0) return null;
+        return (
+          <div className="glass" style={{ padding: 24, marginTop: 20, borderLeft: '4px solid var(--amber)' }}>
+            <h3 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--amber)' }}>
+              <Clock size={18} /> Stock Expiry Alerts
+              <span className="badge badge-warning" style={{ marginLeft: 4 }}>{expiring.length}</span>
+            </h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 12 }}>
+              {expiring.map(p => {
+                const isCritical = p.daysLeft <= 7;
+                const isExpired  = p.daysLeft < 0;
+                return (
+                  <div key={p.id} style={{
+                    padding: '12px 14px', borderRadius: 10,
+                    background: isExpired ? 'rgba(244,63,94,0.07)' : isCritical ? 'rgba(245,158,11,0.07)' : 'rgba(255,255,255,0.03)',
+                    border: `1px solid ${isExpired ? 'var(--rose-g)' : isCritical ? 'var(--amber-g)' : 'var(--border)'}`,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                      <span style={{ fontWeight: 700, fontSize: '0.88rem' }}>{p.name}</span>
+                      <span style={{
+                        fontSize: '0.68rem', fontWeight: 800, padding: '2px 8px', borderRadius: 10,
+                        background: isExpired ? 'var(--rose-s)' : isCritical ? 'var(--amber-s)' : 'var(--bg-input)',
+                        color: isExpired ? 'var(--rose)' : isCritical ? 'var(--amber)' : 'var(--txt3)'
+                      }}>
+                        {isExpired ? `EXPIRED ${Math.abs(p.daysLeft)}d ago` : `${p.daysLeft}d left`}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>Expiry: {p.expiryDate} · Stock: {p.stock} {p.unit || 'pcs'}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

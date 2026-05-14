@@ -563,5 +563,39 @@ input, select, textarea { font-size: 16px !important; }
 #barcode-scanner-container { width: 100%; height: 220px; border-radius: 10px; overflow: hidden; background: #000; }
 #barcode-scanner-container video { width: 100%; height: 100%; object-fit: cover; }
 
+/* ── Thermal Receipt Print Styles (80mm) ─────────────────────────────────── */
+@media print {
+  /* Hide everything except receipt */
+  body > * { display: none !important; }
+  .modal-overlay, .modal-box { display: block !important; position: static !important; background: #fff !important; box-shadow: none !important; border: none !important; }
+  .modal-overlay { padding: 0 !important; }
+  .modal-box { max-width: 100% !important; width: 100% !important; }
+  .modal-head, .modal-foot { display: none !important; }
+  .modal-body { padding: 0 !important; overflow: visible !important; max-height: none !important; }
 
+  /* Receipt styles */
+  .receipt-print {
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 12px !important;
+    color: #000 !important;
+    background: #fff !important;
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+    padding: 4mm !important;
+    page-break-after: always;
+  }
+  .receipt-print * { color: #000 !important; background: transparent !important; border-color: #000 !important; }
+  .receipt-business-name { font-size: 16px !important; font-weight: bold !important; text-align: center !important; }
+  .receipt-divider { border-top: 1px dashed #000 !important; margin: 4px 0 !important; }
+  .receipt-row { display: flex !important; justify-content: space-between !important; font-size: 11px !important; padding: 1px 0 !important; }
+  .receipt-total-row { display: flex !important; justify-content: space-between !important; font-size: 14px !important; font-weight: bold !important; border-top: 2px solid #000 !important; padding-top: 4px !important; margin-top: 2px !important; }
+  .receipt-center { text-align: center !important; }
+  .receipt-footer { text-align: center !important; font-size: 10px !important; margin-top: 8px !important; border-top: 1px dashed #000 !important; padding-top: 6px !important; }
+  .receipt-item-name { max-width: 60% !important; word-break: break-word !important; }
+  .receipt-logo { max-width: 60px !important; max-height: 60px !important; display: block !important; margin: 0 auto 6px !important; }
 
+  /* Hide non-print elements */
+  .btn, button, nav, aside, header, .sidebar, .topbar, .bottom-nav { display: none !important; }
+  @page { size: 80mm auto; margin: 0; }
+}
