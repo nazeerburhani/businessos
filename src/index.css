@@ -6,6 +6,11 @@
   --bg-card: rgba(14, 18, 34, 0.7);
   --bg-input: rgba(255,255,255,0.04);
   --sidebar-w: 260px;
+  /* Yellow accent */
+  --accent: #FFC107;
+  --accent-dark: #e6ac00;
+  --accent-s: rgba(255,193,7,0.10);
+  --accent-g: rgba(255,193,7,0.25);
   --cyan: #00c8f0; --cyan-g: rgba(0,200,240,0.2); --cyan-s: rgba(0,200,240,0.07);
   --violet: #8b5cf6; --violet-g: rgba(139,92,246,0.2); --violet-s: rgba(139,92,246,0.07);
   --emerald: #10b981; --emerald-g: rgba(16,185,129,0.2); --emerald-s: rgba(16,185,129,0.07);
@@ -20,10 +25,14 @@
 
 /* ── Light Theme ─────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg: #f0f4f8;
+  --bg: #fafaf8;
   --bg-surface: rgba(255,255,255,0.97);
   --bg-card: rgba(255,255,255,0.9);
   --bg-input: rgba(0,0,0,0.04);
+  --accent: #e6ac00;
+  --accent-dark: #c99600;
+  --accent-s: rgba(230,172,0,0.10);
+  --accent-g: rgba(230,172,0,0.25);
   --txt: #0f172a; --txt2: #334155; --txt3: #64748b;
   --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.14);
 }
@@ -598,4 +607,203 @@ input, select, textarea { font-size: 16px !important; }
   /* Hide non-print elements */
   .btn, button, nav, aside, header, .sidebar, .topbar, .bottom-nav { display: none !important; }
   @page { size: 80mm auto; margin: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   YELLOW ACCENT — Buttons, Badges, Sidebar active, Borders
+═══════════════════════════════════════════════════════════════════════ */
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+  font-weight: 800;
+  border: none;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-g);
+}
+.btn-success {
+  background: var(--emerald);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+}
+.btn-success:hover:not(:disabled) { background: #0ea16e; }
+
+/* Sidebar active item — yellow highlight */
+.sidebar-item.active {
+  background: var(--accent-s) !important;
+  border-left: 3px solid var(--accent) !important;
+  color: var(--accent) !important;
+}
+.sidebar-item.active svg { color: var(--accent) !important; }
+
+/* Badges */
+.badge-primary { background: var(--accent-s); color: var(--accent); border: 1px solid var(--accent-g); }
+
+/* Input focus yellow ring */
+.input:focus, .select-input:focus, .textarea-input:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-s) !important;
+}
+
+/* TopBar active underline yellow */
+.topbar { border-bottom: 1px solid var(--accent-g); }
+
+/* Page title yellow accent line */
+.page-title::after {
+  display: none; /* remove if causes issues */
+}
+
+/* Login page — yellow accent */
+.login-icon {
+  background: linear-gradient(135deg, var(--accent), #ff8c00) !important;
+  box-shadow: 0 6px 24px var(--accent-g) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Complete overhaul for 320px–768px screens
+═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Base mobile touch targets ── */
+@media (max-width: 768px) {
+  /* Ensure no horizontal overflow anywhere */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { overflow-x: hidden; width: 100%; max-width: 100vw; }
+
+  /* All buttons: minimum 44×44px touch target */
+  .btn, button:not(.qty-btn):not(.icon-btn) {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+  .btn-sm { min-height: 36px; min-width: 36px; padding: 6px 10px; font-size: 0.78rem; }
+  .icon-btn { min-width: 40px; min-height: 40px; width: 40px; height: 40px; }
+
+  /* ── App Layout ── */
+  .app-container { flex-direction: column; }
+  .main-content { margin-left: 0 !important; padding-bottom: 80px; width: 100%; }
+  .sidebar { display: none !important; }
+
+  /* ── TopBar ── */
+  .topbar { padding: 8px 12px; gap: 8px; }
+  .topbar-search { flex: 1; min-width: 0; }
+  .topbar-search input { font-size: 0.82rem; padding: 8px 10px 8px 32px; }
+  .topbar-date { display: none; }
+  .topbar-right { gap: 6px; }
+
+  /* ── Page layout ── */
+  .page-body { padding: 12px; }
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px;
+  }
+  .page-header > div:last-child { width: 100%; display: flex; gap: 8px; flex-wrap: wrap; }
+  .page-header .btn { flex: 1; justify-content: center; }
+  .page-title { font-size: 1.2rem; }
+
+  /* ── Stat cards: 2 per row on mobile ── */
+  .stats-grid,
+  div[style*="grid-template-columns: repeat(4"],
+  div[style*="grid-template-columns: repeat(5"] {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+
+  /* ── Card / glass ── */
+  .card { padding: 12px !important; border-radius: 12px; }
+  .glass { border-radius: 12px; }
+
+  /* ── Tables → card list view on mobile ── */
+  .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tbl { min-width: 500px; }
+  .tbl th, .tbl td { padding: 8px 10px; font-size: 0.78rem; }
+
+  /* ── Modals ── */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal-box {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh;
+    overflow-y: auto;
+    margin: 0 !important;
+  }
+  .modal-body { padding: 16px; }
+  .modal-foot { padding: 12px 16px; gap: 10px; }
+  .modal-foot .btn { flex: 1; }
+
+  /* ── Form grids → single column ── */
+  .form-grid, .grid-2,
+  div[style*="grid-template-columns: 1fr 1fr"],
+  div[style*="grid-template-columns: repeat(2"],
+  div[style*="grid-template-columns: 2fr 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* ── POS layout ── */
+  .pos-layout { flex-direction: column !important; height: auto !important; }
+  .pos-products { height: 300px; overflow-y: auto; }
+  .pos-cart { height: auto; max-height: 60vh; }
+  .pos-product-card { padding: 10px; }
+
+  /* ── Login ── */
+  .login-page { padding: 12px; align-items: flex-start; padding-top: 40px; min-height: 100vh; }
+  .login-card { padding: 24px 18px !important; width: 100%; max-width: 100%; border-radius: 16px; }
+
+  /* ── Sidebar becomes bottom nav ── */
+  .bottom-nav { display: flex !important; }
+
+  /* ── Search bars ── */
+  .search-box { width: 100%; }
+  .search-input { font-size: 0.85rem; }
+
+  /* ── Purchases grid fix ── */
+  div[style*="gridTemplateColumns: 'repeat(3, 1fr)'"],
+  div[style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* ── Page header button wrap ── */
+  .page-header { flex-wrap: wrap; }
+  .page-header > div { width: 100%; }
+
+  /* ── Filters row ── */
+  div[style*="display: 'flex'"][style*="gap"][style*="flexWrap"] { flex-wrap: wrap !important; }
+
+  /* ── Credit footer ── */
+  .credit-footer { font-size: 0.6rem; padding: 6px 12px; text-align: center; }
+  .credit-footer span { display: none; }
+
+  /* ── Stat cards in summaries ── */
+  div[style*="gridTemplateColumns: 'repeat(3, 1fr)'"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav { height: 64px; padding: 0 4px; }
+  .bottom-nav-item { padding: 6px 4px; font-size: 0.6rem; gap: 2px; }
+  .bottom-nav-item svg { width: 20px; height: 20px; }
+
+  /* ── Khata bulk reminder buttons ── */
+  div[style*="display: 'flex'"][style*="flex-wrap: 'wrap'"] { gap: 8px !important; }
+
+  /* ── Command palette ── */
+  div[style*="min(600px, 95vw)"] { width: 96vw !important; top: 8vh !important; }
+}
+
+/* ── Extra small phones (< 380px) ── */
+@media (max-width: 380px) {
+  .page-body { padding: 8px; }
+  .page-title { font-size: 1.05rem; }
+  .btn { font-size: 0.78rem; padding: 9px 10px; }
+  .tbl th, .tbl td { padding: 6px 8px; font-size: 0.72rem; }
+  .login-card { padding: 18px 14px !important; }
+  .bottom-nav-item span { display: none; }
+  .bottom-nav { justify-content: space-around; }
 }

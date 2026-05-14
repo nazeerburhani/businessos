@@ -108,16 +108,6 @@ export default function TopBar({ searchQuery, setSearchQuery, setActiveTab }) {
           {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
         </div>
 
-        {/* Language toggle */}
-        <button
-          className="icon-btn"
-          onClick={toggleLang}
-          title={isUrdu ? 'Switch to English' : 'اردو میں بدلیں'}
-          style={{ fontSize: '0.72rem', fontWeight: 700, padding: '4px 8px', width: 'auto', gap: 4, color: isUrdu ? 'var(--amber)' : 'var(--txt2)' }}
-        >
-          <Globe size={14} />
-          {isUrdu ? 'EN' : 'اردو'}
-        </button>
 
         {/* Theme toggle */}
         <button
