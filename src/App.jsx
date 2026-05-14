@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useBusiness } from './context/BusinessContext';
+import { auth } from './firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 import Sidebar from './components/Sidebar';
 import TopBar from './components/TopBar';
 import AiAssistant from './components/AiAssistant';
 import BottomNav from './components/BottomNav';
+import { Loader2 } from 'lucide-react';
 
 import Dashboard from './modules/Dashboard';
 import POS from './modules/POS';
@@ -32,8 +35,36 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
   const [userEmail, setUserEmail] = useState('');
   const [shortcutToast, setShortcutToast] = useState('');
+
+  // ── Auth persistence ──────────────────────────────────────────────────
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        setUserEmail(user.email || '');
+      } else {
+        setIsAuthenticated(false);
+        setUserEmail('');
+      }
+      setIsInitializing(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ── Premium Polish: Dynamic Titles & Haptics ─────────────────────────
+  useEffect(() => {
+    if (isAuthenticated) {
+      const label = activeTab.charAt(0).toUpperCase() + activeTab.slice(1);
+      document.title = `BusinessOS | ${label}`;
+      // Subtle vibration on mobile
+      if ('vibrate' in navigator) navigator.vibrate(8);
+    } else {
+      document.title = 'BusinessOS | Login';
+    }
+  }, [activeTab, isAuthenticated]);
 
   // ── Keyboard shortcuts ──────────────────────────────────────────────────
   useEffect(() => {
@@ -62,6 +93,15 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, [isAuthenticated]);
 
+
+  if (isInitializing) {
+    return (
+      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#000', gap: 20 }}>
+        <Loader2 className="anim-spin" size={40} color="var(--accent)" />
+        <div style={{ color: 'var(--txt2)', fontSize: '0.9rem', letterSpacing: '2px', fontWeight: 600 }}>BOOTING BUSINESSOS...</div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
