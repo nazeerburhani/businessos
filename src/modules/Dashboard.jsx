@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star, Download, Clock, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star, Download, Clock, AlertCircle, Cake, MessageCircle } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import { useTranslation } from '../hooks/useTranslation';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -45,6 +45,22 @@ export default function Dashboard({ setActiveTab }) {
 
   const lowStock = data.products.filter(p => p.stock <= p.minStock);
   const recentTxns = data.transactions.slice(0, 8);
+
+  // ── Birthday Reminders ───────────────────────────────────────────────────
+  const today = new Date();
+  const birthdays = data.khata.filter(k => {
+    if (!k.dob) return false;
+    const dob = new Date(k.dob);
+    const thisYear = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+    const diff = Math.round((thisYear - today) / (1000 * 60 * 60 * 24));
+    return diff >= 0 && diff <= 7;
+  }).map(k => {
+    const dob = new Date(k.dob);
+    const thisYear = new Date(today.getFullYear(), dob.getMonth(), dob.getDate());
+    const daysLeft = Math.round((thisYear - today) / (1000 * 60 * 60 * 24));
+    const age = today.getFullYear() - dob.getFullYear();
+    return { ...k, daysLeft, age };
+  }).sort((a, b) => a.daysLeft - b.daysLeft);
 
   // ── Onboarding Steps ───────────────────────────────────────────────────
   const onboardingSteps = [
@@ -318,6 +334,49 @@ export default function Dashboard({ setActiveTab }) {
           </div>
         );
       })()}
+
+      {/* ── Birthday Reminders ── */}
+      {birthdays.length > 0 && (
+        <div className="glass" style={{ padding: 24, marginTop: 20, borderLeft: '4px solid var(--violet)' }}>
+          <h3 style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--violet)' }}>
+            <Cake size={18} /> 🎂 Upcoming Customer Birthdays
+            <span style={{ marginLeft: 4, padding: '2px 8px', borderRadius: 10, background: 'var(--violet-s)', color: 'var(--violet)', fontSize: '0.72rem', fontWeight: 700 }}>{birthdays.length}</span>
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 12 }}>
+            {birthdays.map(k => {
+              const isToday = k.daysLeft === 0;
+              const bMsg = `🎂 Happy Birthday ${k.name}! Wishing you a wonderful ${k.age}th birthday! Thank you for being our valued customer at ${data.settings.businessName}. 🎉`;
+              return (
+                <div key={k.id} style={{
+                  padding: '14px 16px', borderRadius: 12,
+                  background: isToday ? 'linear-gradient(135deg, rgba(139,92,246,0.12), rgba(0,200,240,0.08))' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${isToday ? 'var(--violet-g)' : 'var(--border)'}`,
+                  position: 'relative', overflow: 'hidden',
+                }}>
+                  {isToday && <div style={{ position: 'absolute', top: 0, right: 0, background: 'var(--violet)', color: '#fff', fontSize: '0.6rem', fontWeight: 800, padding: '2px 8px', borderRadius: '0 0 0 8px' }}>🎉 TODAY!</div>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ fontSize: '2rem', flexShrink: 0 }}>{isToday ? '🎂' : '🎈'}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 800, color: isToday ? 'var(--violet)' : 'var(--txt)' }}>{k.name}</div>
+                      <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>
+                        {isToday ? `Turning ${k.age} today!` : `${k.daysLeft} day${k.daysLeft !== 1 ? 's' : ''} away · Turning ${k.age}`}
+                      </div>
+                    </div>
+                    {k.phone && (
+                      <a href={`https://wa.me/${k.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(bMsg)}`}
+                        target="_blank" rel="noreferrer"
+                        className="btn btn-sm"
+                        style={{ color: '#25D366', border: '1px solid #25D36655', background: 'rgba(37,211,102,0.1)', flexShrink: 0 }}>
+                        <MessageCircle size={12} /> Wish
+                      </a>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

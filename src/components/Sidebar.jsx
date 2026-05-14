@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp, Truck, ShoppingBag, FileText, Star, Shield, Moon, Tag } from 'lucide-react';
+import { Zap, LayoutDashboard, ShoppingCart, Package, BookOpen, CreditCard, BarChart2, Users, Settings, LogOut, ChevronUp, Truck, ShoppingBag, FileText, Star, Shield, Moon, Tag, RefreshCw, TrendingUp, Globe } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
@@ -12,6 +12,7 @@ const navGroups = [
       { id: 'inventory', label: 'Inventory', icon: Package, color: 'e', badgeKey: 'stock' },
       { id: 'purchases', label: 'Purchases', icon: ShoppingBag, color: 'e' },
       { id: 'suppliers', label: 'Suppliers', icon: Truck, color: 'a' },
+      { id: 'reorder', label: 'Reorder', icon: RefreshCw, color: 'r' },
     ]
   },
   {
@@ -21,8 +22,10 @@ const navGroups = [
       { id: 'expenses', label: 'Expenses', icon: CreditCard, color: 'r' },
       { id: 'analytics', label: 'Analytics', icon: BarChart2, color: 'v' },
       { id: 'reports', label: 'Reports', icon: FileText, color: 'c' },
+      { id: 'margin', label: 'Margins', icon: TrendingUp, color: 'e' },
       { id: 'coupons', label: 'Coupons', icon: Tag, color: 'v' },
       { id: 'eod', label: 'EOD Report', icon: Moon, color: 'a' },
+      { id: 'currency', label: 'Currencies', icon: Globe, color: 'c' },
     ]
   },
   {

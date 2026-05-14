@@ -3,7 +3,7 @@ import { BookOpen, Plus, Trash2, Phone, TrendingUp, TrendingDown, Eye, User, Sho
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
-const emptyCustomer = { name: '', phone: '', email: '', address: '', creditLimit: '' };
+const emptyCustomer = { name: '', phone: '', email: '', address: '', creditLimit: '', dob: '' };
 
 export default function Khata() {
   const { data, saveKhataCustomer, deleteKhataCustomer, addKhataEntry } = useBusiness();
@@ -181,6 +181,11 @@ export default function Khata() {
               <div className="input-wrap">
                 <label className="input-label">Address</label>
                 <input className="input" value={custForm.address} onChange={e => setCustForm({ ...custForm, address: e.target.value })} placeholder="Optional" />
+              </div>
+              <div className="input-wrap">
+                <label className="input-label">🎂 Date of Birth</label>
+                <input className="input" type="date" value={custForm.dob || ''} onChange={e => setCustForm({ ...custForm, dob: e.target.value })} />
+                <span style={{ fontSize: '0.68rem', color: 'var(--txt3)', marginTop: 3 }}>Used for birthday reminders on Dashboard</span>
               </div>
             </div>
           </div>

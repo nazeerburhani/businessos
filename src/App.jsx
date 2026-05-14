@@ -21,6 +21,9 @@ import Loyalty from './modules/Loyalty';
 import UserAccess from './modules/UserAccess';
 import EODReport from './modules/EODReport';
 import Coupons from './modules/Coupons';
+import Reorder from './modules/Reorder';
+import MarginAnalysis from './modules/MarginAnalysis';
+import CurrencyConverter from './modules/CurrencyConverter';
 import Login from './modules/Login';
 
 export default function App() {
@@ -85,6 +88,9 @@ export default function App() {
       case 'loyalty':    return <Loyalty />;
       case 'coupons':    return <Coupons />;
       case 'eod':        return <EODReport />;
+      case 'reorder':    return <Reorder />;
+      case 'margin':     return <MarginAnalysis />;
+      case 'currency':   return <CurrencyConverter />;
       case 'useraccess': return <UserAccess />;
       case 'settings':   return <Settings />;
       default:           return <Dashboard setActiveTab={setActiveTab} />;
