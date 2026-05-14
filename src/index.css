@@ -798,6 +798,22 @@ input, select, textarea { font-size: 16px !important; }
 
   /* ── Command palette ── */
   div[style*="min(600px, 95vw)"] { width: 96vw !important; top: 8vh !important; }
+
+  /* ── Compact Alert List (Mobile) ── */
+  .compact-alert-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  .compact-alert-list > div {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    font-size: 0.75rem !important;
+  }
+  .compact-alert-list > div > div:first-child { font-weight: 600 !important; }
+  .alert-container-mobile h3 { font-weight: 800 !important; }
 }
 
 /* ── Extra small phones (< 380px) ── */

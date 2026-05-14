@@ -52,8 +52,12 @@ export default function Login({ onLogin }) {
       case 'auth/invalid-api-key':
       case 'auth/api-key-not-valid':
         return 'Firebase not configured. Use Demo Mode below.';
+      case 'auth/operation-not-allowed':
+        return 'Google sign-in is not enabled in Firebase Console.';
+      case 'auth/unauthorized-domain':
+        return 'This domain is not authorized for Firebase Auth.';
       default:
-        return 'Something went wrong. Please try again.';
+        return `Error: ${code}. Please check Firebase settings.`;
     }
   };
 

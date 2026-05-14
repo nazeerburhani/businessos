@@ -301,12 +301,12 @@ export default function Dashboard({ setActiveTab }) {
 
         if (expiring.length === 0) return null;
         return (
-          <div className="glass" style={{ padding: '16px 20px', marginTop: 16, borderLeft: '4px solid var(--amber)' }}>
-            <h3 style={{ marginBottom: 12, display: 'flex', alignItems: 'center', gap: 8, color: 'var(--amber)', fontSize: '1rem' }}>
-              <Clock size={16} /> Stock Expiry
-              <span className="badge badge-warning" style={{ marginLeft: 4, fontSize: '0.65rem' }}>{expiring.length}</span>
+          <div className="glass alert-container-mobile" style={{ padding: '12px 16px', marginTop: 16, borderLeft: '4px solid var(--amber)' }}>
+            <h3 style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, color: 'var(--amber)', fontSize: '0.9rem' }}>
+              <Clock size={14} /> Stock Expiry
+              <span className="badge badge-warning" style={{ marginLeft: 'auto', fontSize: '0.6rem' }}>{expiring.length} Total</span>
             </h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
+            <div className="compact-alert-list">
               {expiring.map(p => {
                 const isCritical = p.daysLeft <= 7;
                 const isExpired  = p.daysLeft < 0;
