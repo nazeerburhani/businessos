@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
+import { DollarSign, TrendingUp, CreditCard, BookOpen, Package, ShoppingCart, AlertTriangle, CheckCircle, ArrowRight, Zap, Star } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -16,7 +16,7 @@ function StatCard({ label, value, icon: Icon, type, meta }) {
   );
 }
 
-export default function Dashboard() {
+export default function Dashboard({ setActiveTab }) {
   const { data, stats } = useBusiness();
   const cur = data.settings.currency;
   const fmt = (n) => `${cur} ${(n || 0).toLocaleString()}`;
@@ -28,6 +28,39 @@ export default function Dashboard() {
 
   const lowStock = data.products.filter(p => p.stock <= p.minStock);
   const recentTxns = data.transactions.slice(0, 8);
+
+  // ── Onboarding Steps ───────────────────────────────────────────────────
+  const onboardingSteps = [
+    {
+      id: 1,
+      icon: '🏪',
+      title: 'Set up your shop',
+      desc: 'Add your business name, address, and logo',
+      done: data.settings.businessName !== 'My Business' && data.settings.businessName !== '',
+      action: () => setActiveTab('settings'),
+      actionLabel: 'Open Settings',
+    },
+    {
+      id: 2,
+      icon: '📦',
+      title: 'Add your first product',
+      desc: 'Add products to your inventory with prices and stock',
+      done: data.products.length > 0,
+      action: () => setActiveTab('inventory'),
+      actionLabel: 'Add Product',
+    },
+    {
+      id: 3,
+      icon: '💰',
+      title: 'Make your first sale',
+      desc: 'Go to POS, add products to cart and complete a sale',
+      done: data.transactions.length > 0,
+      action: () => setActiveTab('pos'),
+      actionLabel: 'Open POS',
+    },
+  ];
+  const onboardingDone = onboardingSteps.every(s => s.done);
+  const completedCount = onboardingSteps.filter(s => s.done).length;
 
   return (
     <div className="page-body anim-fade">
@@ -41,6 +74,48 @@ export default function Dashboard() {
           <div style={{ fontSize: '1.6rem', fontWeight: 800, color: stats.netProfit >= 0 ? 'var(--emerald)' : 'var(--rose)' }}>{fmt(stats.netProfit)}</div>
         </div>
       </div>
+
+      {/* ── Onboarding Banner ── */}
+      {!onboardingDone && (
+        <div className="glass" style={{ padding: 20, marginBottom: 20, border: '1px solid rgba(99,102,241,0.3)', background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(0,200,240,0.05))' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <Zap size={18} color="var(--violet)" />
+              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>Getting Started</span>
+              <span style={{ fontSize: '0.72rem', background: 'var(--violet)', color: '#fff', padding: '2px 8px', borderRadius: 10, fontWeight: 700 }}>{completedCount}/{onboardingSteps.length}</span>
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--txt3)' }}>Complete these steps to unlock full potential</div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
+            {onboardingSteps.map(step => (
+              <div key={step.id} style={{ padding: '14px', borderRadius: 10, background: step.done ? 'rgba(16,185,129,0.08)' : 'rgba(255,255,255,0.04)', border: `1px solid ${step.done ? 'var(--emerald-g)' : 'var(--border)'}` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                  <span style={{ fontSize: '1.2rem' }}>{step.icon}</span>
+                  {step.done ? <CheckCircle size={14} color="var(--emerald)" /> : <div style={{ width: 14, height: 14, borderRadius: '50%', border: '2px solid var(--border2)' }} />}
+                  <span style={{ fontWeight: 700, fontSize: '0.82rem', color: step.done ? 'var(--emerald)' : 'var(--txt)' }}>{step.title}</span>
+                </div>
+                <div style={{ fontSize: '0.72rem', color: 'var(--txt3)', marginBottom: 10 }}>{step.desc}</div>
+                {!step.done && (
+                  <button className="btn btn-ghost btn-sm" style={{ fontSize: '0.7rem', padding: '4px 10px', color: 'var(--violet)' }} onClick={step.action}>
+                    {step.actionLabel} <ArrowRight size={11} style={{ display: 'inline' }} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Today's quick stats */}
+      {stats.todaySales > 0 && (
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16, padding: '10px 16px', background: 'rgba(0,200,240,0.06)', borderRadius: 10, border: '1px solid rgba(0,200,240,0.15)', alignItems: 'center', flexWrap: 'wrap' }}>
+          <Star size={14} color="var(--amber)" />
+          <span style={{ fontSize: '0.82rem', fontWeight: 600 }}>Today:</span>
+          <span style={{ fontSize: '0.82rem', color: 'var(--cyan)' }}>{fmt(stats.todayRevenue)}</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--txt3)' }}>in {stats.todaySales} sale{stats.todaySales !== 1 ? 's' : ''}</span>
+          {stats.expiringSoon > 0 && <span style={{ marginLeft: 'auto', fontSize: '0.75rem', color: 'var(--amber)', fontWeight: 600 }}>⏰ {stats.expiringSoon} products expiring soon</span>}
+        </div>
+      )}
 
       <div className="stat-grid">
         <StatCard label="Total Revenue" value={fmt(stats.totalRevenue)} icon={TrendingUp} type="c" meta={`${data.transactions.length} sales`} />

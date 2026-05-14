@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen } from 'lucide-react';
+import { ShoppingCart, Plus, Trash2, CheckCircle, Printer, Pause, Play, X, MessageCircle, AlertTriangle, CreditCard, Banknote, BookOpen, Camera } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
+import BarcodeScanner from '../components/BarcodeScanner';
 
 // ─── RECEIPT COMPONENT ────────────────────────────────────────────────────────
 function Receipt({ txn, settings, onClose }) {
@@ -91,9 +92,21 @@ export default function POS({ searchQuery }) {
   const [heldModal, setHeldModal] = useState(false);
   const [holdNote, setHoldNote] = useState('');
   const [creditAlert, setCreditAlert] = useState(null);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   // Multi-payment state
   const [payments, setPayments] = useState([{ method: 'cash', amount: '', customerId: '' }]);
+
+  const handleBarcodeScan = (code) => {
+    setScannerOpen(false);
+    // Match against SKU field in products
+    const matched = products.find(p => p.sku === code || p.sku?.toLowerCase() === code.toLowerCase());
+    if (matched) {
+      addToCart(matched);
+    } else {
+      alert(`No product found with SKU: ${code}\nPlease add the SKU in Inventory.`);
+    }
+  };
 
   const categories = ['All', ...new Set(products.map(p => p.category).filter(Boolean))];
   const filtered = products.filter(p => {
@@ -203,11 +216,19 @@ export default function POS({ searchQuery }) {
 
         {/* ── Left: Products ── */}
         <div className="glass" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'hidden' }}>
-          {/* Category filter */}
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0 }}>
+          {/* Category filter + scanner button */}
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', flexShrink: 0, alignItems: 'center' }}>
             {categories.map(c => (
               <button key={c} className={`btn btn-sm ${catFilter === c ? 'btn-primary' : 'btn-ghost'}`} onClick={() => setCatFilter(c)}>{c}</button>
             ))}
+            <button
+              className="btn btn-ghost btn-sm btn-icon"
+              style={{ marginLeft: 'auto', color: 'var(--cyan)', border: '1px solid var(--cyan-g)', flexShrink: 0 }}
+              onClick={() => setScannerOpen(true)}
+              title="Scan Barcode"
+            >
+              <Camera size={15} />
+            </button>
           </div>
 
           {/* Products grid */}
@@ -424,6 +445,14 @@ export default function POS({ searchQuery }) {
             setPayments([{ method: 'cash', amount: '', customerId: '' }]);
           }}>Override & Complete Sale</button>
         </div>
+      </Modal>
+
+      {/* ── Barcode Scanner Modal ── */}
+      <Modal isOpen={scannerOpen} onClose={() => setScannerOpen(false)} title="Scan Barcode">
+        <BarcodeScanner
+          onScan={handleBarcodeScan}
+          onClose={() => setScannerOpen(false)}
+        />
       </Modal>
     </div>
   );
