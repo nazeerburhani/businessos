@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { Settings, Save, AlertTriangle, Trash2, Upload, X, Globe, Clock } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Settings, Save, AlertTriangle, Trash2, Upload, X, Globe, Clock, Download, RefreshCw } from 'lucide-react';
 import { useBusiness } from '../context/BusinessContext';
 import Modal from '../components/Modal';
 
 export default function SettingsModule() {
-  const { data, saveSettings, resetData } = useBusiness();
+  const { data, saveSettings, resetData, backupData, restoreData } = useBusiness();
+  const restoreRef = useRef(null);
+  const [restoreMsg, setRestoreMsg] = useState('');
   const [form, setForm] = useState({ ...data.settings });
   const [saved, setSaved] = useState(false);
   const [resetModal, setResetModal] = useState(false);
@@ -164,6 +166,29 @@ export default function SettingsModule() {
             <label className="input-label">Branch & IFSC</label>
             <input className="input" name="branch" value={form.bankDetails?.branch || ''} onChange={e => setForm({...form, bankDetails: {...form.bankDetails, branch: e.target.value}})} placeholder="Main Branch, XYZ123" />
           </div>
+        </div>
+
+        {/* Data Management */}
+        <div className="glass" style={{ padding: 24 }}>
+          <h3 style={{ marginBottom: 16, color: 'var(--emerald)', fontSize: '1rem' }}>Data Management</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+            <button type="button" className="btn btn-ghost" onClick={backupData}>
+              <Download size={15} /> Download Backup
+            </button>
+            <label className="btn btn-ghost" style={{ cursor: 'pointer', justifyContent: 'center' }}>
+              <Upload size={15} /> Restore from File
+              <input ref={restoreRef} type="file" accept=".json" style={{ display: 'none' }} onChange={async (e) => {
+                try {
+                  await restoreData(e.target.files[0]);
+                  setRestoreMsg('✓ Data restored successfully!');
+                  setTimeout(() => setRestoreMsg(''), 3000);
+                } catch (err) { setRestoreMsg('✗ ' + err.message); }
+                e.target.value = '';
+              }} />
+            </label>
+          </div>
+          {restoreMsg && <div style={{ fontSize: '0.8rem', color: restoreMsg.startsWith('✓') ? 'var(--emerald)' : 'var(--rose)', padding: '6px 10px', borderRadius: 6, background: 'rgba(0,0,0,0.2)' }}>{restoreMsg}</div>}
+          <p style={{ fontSize: '0.72rem', color: 'var(--txt3)', marginTop: 8 }}>Backup saves all your products, customers, and transactions as a JSON file. Restore will replace ALL current data.</p>
         </div>
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

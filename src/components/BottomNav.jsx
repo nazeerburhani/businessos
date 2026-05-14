@@ -1,17 +1,17 @@
-import React from 'react';
-import { LayoutDashboard, ShoppingCart, Package, BookOpen, Truck, Users, CreditCard, BarChart2, Settings } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Package, BookOpen, Truck, ShoppingBag, Users, CreditCard, BarChart2, Settings } from 'lucide-react';
 
 export default function BottomNav({ activeTab, setActiveTab }) {
   const tabs = [
-    { id: 'dashboard', label: 'Home', icon: LayoutDashboard },
-    { id: 'pos', label: 'POS', icon: ShoppingCart },
-    { id: 'inventory', label: 'Stock', icon: Package },
-    { id: 'khata', label: 'Khata', icon: BookOpen },
-    { id: 'suppliers', label: 'Supply', icon: Truck },
-    { id: 'employees', label: 'Staff', icon: Users },
-    { id: 'expenses', label: 'Exp.', icon: CreditCard },
-    { id: 'analytics', label: 'Stats', icon: BarChart2 },
-    { id: 'settings', label: 'Set.', icon: Settings },
+    { id: 'dashboard',  label: 'Home',    icon: LayoutDashboard },
+    { id: 'pos',        label: 'POS',     icon: ShoppingCart    },
+    { id: 'inventory',  label: 'Stock',   icon: Package         },
+    { id: 'purchases',  label: 'Buy',     icon: ShoppingBag     },
+    { id: 'khata',      label: 'Khata',   icon: BookOpen        },
+    { id: 'suppliers',  label: 'Supply',  icon: Truck           },
+    { id: 'employees',  label: 'Staff',   icon: Users           },
+    { id: 'expenses',   label: 'Exp.',    icon: CreditCard      },
+    { id: 'analytics',  label: 'Stats',   icon: BarChart2       },
+    { id: 'settings',   label: 'Set.',    icon: Settings        },
   ];
 
   return (

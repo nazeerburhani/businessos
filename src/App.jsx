@@ -15,6 +15,7 @@ import Expenses from './modules/Expenses';
 import Analytics from './modules/Analytics';
 import Settings from './modules/Settings';
 import Suppliers from './modules/Suppliers';
+import Purchases from './modules/Purchases';
 import Login from './modules/Login';
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
       case 'inventory':  return <Inventory searchQuery={searchQuery} />;
       case 'khata':      return <Khata />;
       case 'suppliers':  return <Suppliers />;
+      case 'purchases':  return <Purchases />;
       case 'employees':  return <Staff />;
       case 'expenses':   return <Expenses />;
       case 'analytics':  return <Analytics />;

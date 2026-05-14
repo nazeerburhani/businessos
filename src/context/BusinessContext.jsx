@@ -11,18 +11,18 @@ const initialData = {
     receiptFooter: 'Thank you for your business!',
     logoUrl: '',
     businessHours: '', website: '',
-    bankDetails: { name: '', account: '', branch: '' }
+    bankDetails: { name: '', account: '', branch: '' },
+    roundOff: 'none', // none, nearest1, nearest05
   },
-  accounts: {
-    cash: 0,
-    bank: 0,
-  },
-  products: [], 
-  khata: [], 
+  accounts: { cash: 0, bank: 0 },
+  products: [],
+  khata: [],
   suppliers: [],
   employees: [],
-  expenses: [], 
+  expenses: [],
   transactions: [],
+  purchases: [],
+  heldBills: [],
   stockHistory: [],
   categories: ['General', 'Electronics', 'Clothing', 'Food & Beverage', 'Services', 'Other'],
 };
@@ -33,10 +33,12 @@ export function BusinessProvider({ children }) {
       const s = localStorage.getItem(STORAGE_KEY);
       if (s) {
         const parsed = JSON.parse(s);
-        parsed.settings = { ...initialData.settings, ...(parsed.settings || {}) };
-        parsed.accounts = { ...initialData.accounts, ...(parsed.accounts || {}) };
-        parsed.suppliers = parsed.suppliers || [];
-        parsed.stockHistory = parsed.stockHistory || [];
+        parsed.settings    = { ...initialData.settings,  ...(parsed.settings  || {}) };
+        parsed.accounts    = { ...initialData.accounts,  ...(parsed.accounts  || {}) };
+        parsed.suppliers   = parsed.suppliers   || [];
+        parsed.stockHistory= parsed.stockHistory|| [];
+        parsed.purchases   = parsed.purchases   || [];
+        parsed.heldBills   = parsed.heldBills   || [];
         return parsed;
       }
       return initialData;
@@ -45,31 +47,46 @@ export function BusinessProvider({ children }) {
 
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }, [data]);
 
+  // ─── STATS ───────────────────────────────────────────────────────────────────
   const stats = useMemo(() => {
-    const totalRevenue = data.transactions.reduce((a, t) => a + (t.total || 0), 0);
-    const totalExpenses = data.expenses.reduce((a, e) => a + (e.amount || 0), 0);
-    const pendingKhata = data.khata.reduce((a, k) => a + (k.balance > 0 ? k.balance : 0), 0);
-    const lowStockCount = data.products.filter(p => p.stock > 0 && p.stock <= (p.minStock || 5)).length;
+    const totalRevenue    = data.transactions.reduce((a, t) => a + (t.total || 0), 0);
+    const totalExpenses   = data.expenses.reduce((a, e) => a + (e.amount || 0), 0);
+    const pendingKhata    = data.khata.reduce((a, k) => a + (k.balance > 0 ? k.balance : 0), 0);
+    const lowStockCount   = data.products.filter(p => p.stock > 0 && p.stock <= (p.minStock || 5)).length;
     const outOfStockCount = data.products.filter(p => p.stock === 0).length;
-    
-    // Account balances
-    const cashBalance = data.accounts.cash;
-    const bankBalance = data.accounts.bank;
-    const netProfit = totalRevenue - totalExpenses;
-    
-    return { 
-      totalRevenue, totalExpenses, pendingKhata, 
+    const cashBalance     = data.accounts.cash;
+    const bankBalance     = data.accounts.bank;
+    const netProfit       = totalRevenue - totalExpenses;
+    const todayStr        = new Date().toISOString().split('T')[0];
+    const todayRevenue    = data.transactions.filter(t => t.date === todayStr).reduce((a, t) => a + (t.total || 0), 0);
+    const todaySales      = data.transactions.filter(t => t.date === todayStr).length;
+
+    // Expiring soon (within 30 days)
+    const today = new Date();
+    const expiringSoon = data.products.filter(p => {
+      if (!p.expiryDate) return false;
+      const exp = new Date(p.expiryDate);
+      const diff = (exp - today) / (1000 * 60 * 60 * 24);
+      return diff >= 0 && diff <= 30;
+    }).length;
+
+    return {
+      totalRevenue, totalExpenses, pendingKhata,
       lowStockCount, outOfStockCount, netProfit,
-      cashBalance, bankBalance 
+      cashBalance, bankBalance,
+      todayRevenue, todaySales, expiringSoon,
     };
   }, [data]);
 
+  // ─── PRODUCTS ────────────────────────────────────────────────────────────────
   const saveProduct = (product) => setData(prev => ({
     ...prev,
     products: product.id
       ? prev.products.map(p => p.id === product.id ? product : p)
       : [...prev.products, { ...product, id: Date.now() }]
   }));
+
+  const deleteProduct = (id) => setData(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id) }));
 
   const adjustStock = (productId, qty, reason) => {
     setData(prev => ({
@@ -79,26 +96,32 @@ export function BusinessProvider({ children }) {
     }));
   };
 
-  const deleteProduct = (id) => setData(prev => ({ ...prev, products: prev.products.filter(p => p.id !== id) }));
-
+  // ─── TRANSACTIONS ─────────────────────────────────────────────────────────────
   const addTransaction = (txn) => {
-    // txn: { items, subtotal, tax, discount, total, paymentMethod, customerId }
+    // txn.payments = [{ method: 'cash'|'bank'|'khata', amount, customerId }]
     setData(prev => {
       const newAccounts = { ...prev.accounts };
-      const newKhata = [...prev.khata];
-      
-      if (txn.paymentMethod === 'cash') newAccounts.cash += txn.total;
-      else if (txn.paymentMethod === 'bank') newAccounts.bank += txn.total;
-      else if (txn.paymentMethod === 'khata' && txn.customerId) {
-        const idx = newKhata.findIndex(k => k.id === txn.customerId);
-        if (idx > -1) {
-          newKhata[idx] = { 
-            ...newKhata[idx], 
-            balance: newKhata[idx].balance + txn.total,
-            history: [{ id: Date.now(), date: new Date().toISOString().split('T')[0], amount: txn.total, type: 'debt', desc: 'POS Sale' }, ...(newKhata[idx].history || [])]
-          };
+      let newKhata = [...prev.khata];
+
+      const payments = txn.payments || [{ method: txn.paymentMethod, amount: txn.total, customerId: txn.customerId }];
+
+      payments.forEach(pay => {
+        if (pay.method === 'cash')  newAccounts.cash += pay.amount;
+        else if (pay.method === 'bank') newAccounts.bank += pay.amount;
+        else if (pay.method === 'khata' && pay.customerId) {
+          const idx = newKhata.findIndex(k => k.id === Number(pay.customerId));
+          if (idx > -1) {
+            newKhata[idx] = {
+              ...newKhata[idx],
+              balance: newKhata[idx].balance + pay.amount,
+              history: [{
+                id: Date.now(), date: new Date().toISOString().split('T')[0],
+                amount: pay.amount, type: 'debt', desc: 'POS Sale'
+              }, ...(newKhata[idx].history || [])]
+            };
+          }
         }
-      }
+      });
 
       return {
         ...prev,
@@ -113,12 +136,62 @@ export function BusinessProvider({ children }) {
     });
   };
 
-  const saveSupplier = (sup) => setData(prev => ({
+  // ─── HELD BILLS ──────────────────────────────────────────────────────────────
+  const holdBill = (cart, note = '') => {
+    setData(prev => ({
+      ...prev,
+      heldBills: [...prev.heldBills, {
+        id: Date.now(),
+        cart,
+        note,
+        savedAt: new Date().toLocaleTimeString()
+      }]
+    }));
+  };
+
+  const resumeBill = (id) => {
+    const bill = data.heldBills.find(b => b.id === id);
+    setData(prev => ({ ...prev, heldBills: prev.heldBills.filter(b => b.id !== id) }));
+    return bill;
+  };
+
+  const deleteHeldBill = (id) => setData(prev => ({ ...prev, heldBills: prev.heldBills.filter(b => b.id !== id) }));
+
+  // ─── PURCHASES ───────────────────────────────────────────────────────────────
+  const addPurchase = (purchase) => {
+    // purchase: { supplierId, items: [{productId, qty, costPrice}], total, date }
+    setData(prev => {
+      const newProducts = prev.products.map(p => {
+        const item = purchase.items?.find(i => i.productId === p.id);
+        if (!item) return p;
+        return { ...p, stock: p.stock + item.qty, cost: item.costPrice || p.cost };
+      });
+      const newStockHistory = purchase.items?.map(i => ({
+        id: Date.now() + Math.random(),
+        productId: i.productId,
+        qty: i.qty,
+        reason: 'Purchase',
+        date: new Date().toISOString()
+      })) || [];
+      return {
+        ...prev,
+        purchases: [{ ...purchase, id: Date.now(), date: purchase.date || new Date().toISOString().split('T')[0] }, ...prev.purchases],
+        products: newProducts,
+        stockHistory: [...newStockHistory, ...prev.stockHistory],
+        accounts: { ...prev.accounts, cash: prev.accounts.cash - purchase.total }, // deduct from cash
+      };
+    });
+  };
+
+  // ─── KHATA ───────────────────────────────────────────────────────────────────
+  const saveKhataCustomer = (c) => setData(prev => ({
     ...prev,
-    suppliers: sup.id ? prev.suppliers.map(s => s.id === sup.id ? sup : s) : [...prev.suppliers, { ...sup, id: Date.now(), balance: 0 }]
+    khata: c.id
+      ? prev.khata.map(k => k.id === c.id ? c : k)
+      : [{ ...c, id: Date.now(), balance: 0, history: [] }, ...prev.khata]
   }));
 
-  const deleteSupplier = (id) => setData(prev => ({ ...prev, suppliers: prev.suppliers.filter(s => s.id !== id) }));
+  const deleteKhataCustomer = (id) => setData(prev => ({ ...prev, khata: prev.khata.filter(k => k.id !== id) }));
 
   const addKhataEntry = (customerId, amount, type, desc) => {
     const amt = Number(amount);
@@ -133,6 +206,15 @@ export function BusinessProvider({ children }) {
     }));
   };
 
+  // ─── SUPPLIERS ───────────────────────────────────────────────────────────────
+  const saveSupplier = (sup) => setData(prev => ({
+    ...prev,
+    suppliers: sup.id ? prev.suppliers.map(s => s.id === sup.id ? sup : s) : [...prev.suppliers, { ...sup, id: Date.now(), balance: 0 }]
+  }));
+
+  const deleteSupplier = (id) => setData(prev => ({ ...prev, suppliers: prev.suppliers.filter(s => s.id !== id) }));
+
+  // ─── EMPLOYEES ───────────────────────────────────────────────────────────────
   const saveEmployee = (emp) => setData(prev => ({
     ...prev,
     employees: emp.id
@@ -168,6 +250,7 @@ export function BusinessProvider({ children }) {
     }));
   };
 
+  // ─── EXPENSES ────────────────────────────────────────────────────────────────
   const saveExpense = (exp) => setData(prev => ({
     ...prev,
     expenses: exp.id
@@ -176,18 +259,54 @@ export function BusinessProvider({ children }) {
   }));
 
   const deleteExpense = (id) => setData(prev => ({ ...prev, expenses: prev.expenses.filter(e => e.id !== id) }));
+
+  // ─── SETTINGS ────────────────────────────────────────────────────────────────
   const saveSettings = (s) => setData(prev => ({ ...prev, settings: { ...prev.settings, ...s } }));
   const resetData = () => setData(initialData);
+
+  // ─── BACKUP / RESTORE ────────────────────────────────────────────────────────
+  const backupData = () => {
+    const json = JSON.stringify(data, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `businessos-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const restoreData = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          setData(prev => ({
+            ...initialData,
+            ...parsed,
+            settings: { ...initialData.settings, ...(parsed.settings || {}) },
+          }));
+          resolve(true);
+        } catch { reject(new Error('Invalid backup file')); }
+      };
+      reader.readAsText(file);
+    });
+  };
 
   return (
     <BusinessContext.Provider value={{
       data, stats,
-      saveProduct, deleteProduct, adjustStock, addTransaction,
+      saveProduct, deleteProduct, adjustStock,
+      addTransaction,
+      holdBill, resumeBill, deleteHeldBill,
+      addPurchase,
       saveKhataCustomer, deleteKhataCustomer, addKhataEntry,
       saveSupplier, deleteSupplier,
       saveEmployee, deleteEmployee, markAttendance, processPayroll,
       saveExpense, deleteExpense,
       saveSettings, resetData,
+      backupData, restoreData,
     }}>
       {children}
     </BusinessContext.Provider>
